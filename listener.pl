@@ -2,23 +2,21 @@
 
 use warnings;
 use strict;
-
 use IO::Socket;
 
-my $sock = new IO::Socket::INET(
+my $main_sock = new IO::Socket::INET(
     Localhost => 'gengs-host',
     LocalPort => 1200,
     Proto     => 'tcp',
     Listen    => 5,
     Reuse     => 1,
-);
+) or die "Could not connet : $!";
 
-die "Could not connet : $!" unless $sock;
-
-while (my $new_sock = $sock -> accept()) {
+while (my $new_sock = $main_sock -> accept()) {
     while (defined (my $buf = <$new_sock>)) {
-        print $buf;
+        print "==> $buf\n";
+        print $new_sock "You said : $buf\n";
     }
 }
 
-close $sock;
+close $main_sock;
