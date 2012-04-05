@@ -2,44 +2,52 @@
 
 use warnings;
 use strict;
-
 use IO::Socket;
 use IO::Select;
 
-my %ser_info = (
-    "ser_ip" => "gengs-host",
-    "ser_port" => "1200",
-);
+my $SERVER = '192.168.0.108';
+my $PORT   = '1200';
 
-&main();
+my $socket = IO::Socket::INET->new(
+    PeerAddr => $SERVER,
+    PeerPort => $PORT,
+    Type => SOCK_STREAM,
+    Proto => "tcp",
+) or die "Can not create socket connect.$@";
 
-sub main {
-    my $ser_addr = $ser_info{"ser_ip"};
-    my $ser_port = $ser_info{"ser_port"};
+my $input;
+until (defined $input && $input =~ m{^q$}i) {
+    my $str = talk($input);
+    
+    print $str." > ";
+    $input = <STDIN>;
+    chomp $input;
+}
 
-    my $socket = IO::Socket::INET->new(
-        PeerAddr => $ser_addr,
-        PeerPort => $ser_port,
-        Type => SOCK_STREAM,
-        Proto => "tcp",
-    ) or die "Can not create socket connect.$@";
+$socket -> close() or die "Close Socket failed.$@";
 
-    my $read = <STDIN>;
-    chomp $read;
+sub talk {
+    my $words = defined $input ? shift : 'HELLO';
+    chomp $words;
 
-    $socket->send($read."\n",0);
-    $socket->autoflush(1);  
-    my $sel = IO::Select->new($socket);
-    while (my @ready = $sel->can_read) {
+    print "Sending...[$words]\n";
+    $socket -> send("$words\n", 0);
+    $socket -> autoflush(1);
+
+    my $sel = IO::Select -> new($socket);
+    while (my @ready = $sel -> can_read) {
         foreach my $fh (@ready) {
+            my $str;
             if ($fh == $socket) {
                 while (<$fh>) {
-                    print $_;
+                    $str = $_;
+                    chomp $str;
+                    print "\$str=$str\n";
+                    return $str;
                 }
-                $sel->remove($fh);  
+                $sel -> remove($fh);
                 close $fh;
             }
         }
-    }
-    $socket->close() or die "Close Socket failed.$@";
+    }    
 }

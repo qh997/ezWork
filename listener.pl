@@ -14,8 +14,9 @@ my $main_sock = new IO::Socket::INET(
 
 while (my $new_sock = $main_sock -> accept()) {
     while (defined (my $buf = <$new_sock>)) {
-        print "==> $buf\n";
-        print $new_sock "You said : $buf\n";
+         chomp $buf;
+         print "==> $buf\n";
+         print $new_sock "You said : $buf\n";
     }
 }
 
