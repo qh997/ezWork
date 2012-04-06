@@ -4,8 +4,9 @@ use warnings;
 use strict;
 use IO::Socket;
 use IO::Select;
+use MIME::Base64;
 
-my $SERVER = '192.168.0.108';
+my $SERVER = 'gengs-host';
 my $PORT   = '1200';
 
 my $socket = IO::Socket::INET->new(
@@ -13,36 +14,42 @@ my $socket = IO::Socket::INET->new(
     PeerPort => $PORT,
     Type => SOCK_STREAM,
     Proto => "tcp",
-) or die "Can not create socket connect.$@";
+) or die "Can not create socket connection to server : <$SERVER>.\n$@";
 
-my $input;
-until (defined $input && $input =~ m{^q$}i) {
-    my $str = talk($input);
+my $email = '';
+my $paswd = '';
+my $commd = '';
+my $input = '';
+until ($input =~ m{^q$}i) {
+    my $serstr = talk();
     
-    print $str." > ";
-    $input = <STDIN>;
-    chomp $input;
+    if ($serstr =~ /^(.*?):(.*)$/) {
+        $commd = $1;
+	my $prt_str = $2;
+        print $prt_str;
+
+        $input = <STDIN>;
+        chomp $input;
+
+	if ($commd eq '') {
+	    $email = $input;
+	}
+    }
 }
 
 $socket -> close() or die "Close Socket failed.$@";
 
 sub talk {
-    my $words = defined $input ? shift : 'HELLO';
-    chomp $words;
-
-    print "Sending...[$words]\n";
-    $socket -> send("$words\n", 0);
+    $socket -> send("$email:$commd:$input\n", 0);
     $socket -> autoflush(1);
 
     my $sel = IO::Select -> new($socket);
     while (my @ready = $sel -> can_read) {
         foreach my $fh (@ready) {
-            my $str;
             if ($fh == $socket) {
                 while (<$fh>) {
-                    $str = $_;
+                    my $str = $_;
                     chomp $str;
-                    print "\$str=$str\n";
                     return $str;
                 }
                 $sel -> remove($fh);
