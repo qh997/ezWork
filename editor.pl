@@ -23,7 +23,7 @@ my $commd = 'HELP';
 my $input = '';
 until ($input =~ m{^q$}i) {
     my $serstr = talk();
-    print "RECIVED ==> $serstr\n";
+#    print "RECIVED ==> $serstr\n";
 
     if ($serstr =~ /^(.*?):(.*)$/) {
         my $s_cmd = $1;
@@ -34,7 +34,7 @@ until ($input =~ m{^q$}i) {
 
             if ($s_cmd eq 'PWOK') {
                 $commd = 'HELP';
-                print "$paswd <=> $paspt\n";
+#                print "$paswd <=> $paspt\n";
                 $paswd = $paspt;
             }
             $paspt = '';
@@ -59,7 +59,7 @@ until ($input =~ m{^q$}i) {
 $socket -> close() or die "Close Socket failed.$@";
 
 sub talk {
-    print "SENDING ==> [$acunt:".$paswd.":$commd:".encode_base64($input)."]\n";
+#    print "SENDING ==> [$acunt:".$paswd.":$commd:".encode_base64($input)."]\n";
     $socket -> send("$acunt:".$paswd.":$commd:".encode_base64($input)."\n", 0);
     $socket -> autoflush(1);
 

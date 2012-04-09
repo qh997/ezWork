@@ -44,23 +44,27 @@ while (my $new_sock = $main_sock -> accept()) {
                     elsif ($message =~ /^a$/) {
                         print $new_sock 'ACNT:'.encode_base64('Input your email account > ');
                     }
+                    elsif (!$account) {
+                        print $new_sock 'HELP:'.encode_base64("Use 'a' to login frist.\n?> ");
+                    }
                     elsif ($message =~ /^s$/) {
                         print $new_sock 'PSWD:'.encode_base64('Input your email password > ');
                     }
                     elsif ($message =~ /^p$/) {
                         print $new_sock 'HELP:'.encode_base64(get_account_information($account, $passwrd)."?> ");
                     }
-                    elsif (!$account) {
-                        print $new_sock 'HELP:'.encode_base64("Use 'a' to login frist.\n?> ");
-                    }
                     else {
-                        print $new_sock 'HELP:'.encode_base64("Use 'h' for help.\n?> ");
+                        print $new_sock 'HELP:'.encode_base64("Invalid command, use 'h' for help.\n?> ");
                     }
                 }
                 elsif ($command =~ /^(?:ACNT)$/) {
                     $message = decode_base64($message);
-                    if (get_account($message) eq 'NEW') {
+                    my $acnt_flag = get_account($message);
+                    if ($acnt_flag eq 'NEW') {
                         print $new_sock 'HELP:'.encode_base64("Creat account $message, password [neusoft]\n?> ");
+                    }
+                    elsif ($acnt_flag eq 'ILE') {
+                        print $new_sock 'HELP:'.encode_base64("Not allow empty username!\n?> ");
                     }
                     else {
                         print $new_sock 'HELP:'.encode_base64("Login as $message\n?> ");
@@ -77,7 +81,7 @@ while (my $new_sock = $main_sock -> accept()) {
                                 print $new_sock 'PWOK:'.encode_base64("Password OK.\n?> ");
                             }
                             else {
-		                print $new_sock 'HELP:'.encode_base64("Wrong account or password!\n?> ");
+		                print $new_sock 'HELP:'.encode_base64("Invalid account or password!\n?> ");
                             }
                         }
                         elsif ($chk eq 'LGIN') {
@@ -85,7 +89,7 @@ while (my $new_sock = $main_sock -> accept()) {
                             print $new_sock 'PWOK:'.encode_base64("Password changed.\n?> ");
                         }
 		        elsif ($chk eq 'ILLE') {
-		            print $new_sock 'HELP:'.encode_base64("ILLE Wrong account or password!\n?> ");
+		            print $new_sock 'HELP:'.encode_base64("Invalid account or password!\n?> ");
 		        }
                     }
                 }
@@ -101,6 +105,8 @@ close $main_sock;
 sub get_account {
     my $account = shift;
     chomp $account;
+
+    return 'ILE' if $account =~ /^\s*$/;
 
     open my $UF, '< '.$USERFILE;
     my @user_list = <$UF>;
@@ -170,6 +176,6 @@ sub get_account_information {
         return $ifm;
     }
     else {
-        return "Wrong account or password!\n";
+        return "Invalid account or password!\n";
     }
 }
