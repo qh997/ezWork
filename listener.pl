@@ -24,34 +24,38 @@ my $main_sock = new IO::Socket::INET(
 ) or die "Could not connet : $!";
 
 while (my $new_sock = $main_sock -> accept()) {
-    while (defined (my $buf = <$new_sock>)) {
-        chomp $buf;
-        print "From client => $buf\n";
+    if (my $pid = fork) {
+        while (defined (my $buf = <$new_sock>)) {
+            chomp $buf;
+            print "From client => $buf\n";
 
-        if ($buf =~ /^(.*?):(.*?):(.*?):(.*?)$/) {
-            my $account = $1;
-            my $passwrd = $2;
-            my $command = $3;
-            my $message = decode_base64($4);
+            if ($buf =~ /^(.*?):(.*?):(.*?):(.*?)$/) {
+                my $account = $1;
+                my $passwrd = $2;
+                my $command = $3;
+                my $message = decode_base64($4);
 
-            if ($command =~ /^(?:HELP)$/) {
-                print $new_sock 'HELP:'.encode_base64($HELPLIST) if $message =~ /^h?$/;
-                print $new_sock 'ACNT:'.encode_base64('Input your email account > ') if $message =~ /^a$/;
-            }
-            elsif ($command =~ /^(?:ACNT)$/) {
-                if (get_account($message) eq 'NEW') {
-                    print $new_sock 'HELP:'.encode_base64("Creat account $message\n?> ");
+                if ($command =~ /^(?:HELP)$/) {
+                    print $new_sock 'HELP:'.encode_base64($HELPLIST) if $message =~ /^h?$/;
+                    print $new_sock 'ACNT:'.encode_base64('Input your email account > ') if $message =~ /^a$/;
                 }
-                else {
-                    print $new_sock 'PSWD:'.encode_base64("Enter password for $message\n?> ");
+                elsif ($command =~ /^(?:ACNT)$/) {
+                    if (get_account($message) eq 'NEW') {
+                        print $new_sock 'HELP:'.encode_base64("Creat account $message\n?> ");
+                    }
+                    else {
+                        print $new_sock 'PSWD:'.encode_base64("Enter password for $message\n?> ");
+                    }
                 }
-            }
-            elsif ($command =~ /^(?:PSWD)$/) {
-                if (check_password($account, $passwrd) eq 'NEW') {
+                elsif ($command =~ /^(?:PSWD)$/) {
+                    if (check_password($account, $passwrd) eq 'NEW') {
                     print $new_sock 'HELP:'.encode_base64("Creat account $message\n?> ");
+                    }
                 }
             }
         }
+
+    exit 0;
     }
 }
 
