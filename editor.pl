@@ -18,6 +18,7 @@ my $socket = IO::Socket::INET->new(
 
 my $acunt = '';
 my $paswd = '';
+my $paspt = '';
 my $commd = 'HELP';
 my $input = '';
 until ($input =~ m{^q$}i) {
@@ -27,11 +28,15 @@ until ($input =~ m{^q$}i) {
         my $s_cmd = $1;
 	my $msg = decode_base64($2);
 
-        unless ($s_cmd eq 'EROR') {
+        if ($s_cmd ne 'EROR') {
             $commd = $s_cmd;
         }
         else {
             $commd = 'HELP';
+            if ($s_cmd eq 'PWOK') {
+                $paswd = $paspt;
+            }
+            $paspt = '';
         }
 
         print $msg;
@@ -40,14 +45,18 @@ until ($input =~ m{^q$}i) {
         chomp $input;
 
 	$acunt = $input if $commd eq 'ACNT';
-	$paswd = $input if $commd eq 'PSWD';
+        if ($commd eq 'PSWD') {
+	    $paspt = encode_base64($input);
+            chomp $paspt;
+        }
     }
 }
 
 $socket -> close() or die "Close Socket failed.$@";
 
 sub talk {
-    $socket -> send("$acunt:".encode_base64($paswd).":$commd:".encode_base64($input)."\n", 0);
+#    print "SENDING ==> [$acunt:".$paswd.":$commd:".encode_base64($input)."]\n";
+    $socket -> send("$acunt:".$paswd.":$commd:".encode_base64($input)."\n", 0);
     $socket -> autoflush(1);
 
     my $sel = IO::Select -> new($socket);
