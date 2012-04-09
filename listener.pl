@@ -82,7 +82,7 @@ while (my $new_sock = $main_sock -> accept()) {
                         }
                         elsif ($chk eq 'LGIN') {
                             change_password($account, $message);
-                            print $new_sock 'HELP:'.encode_base64("Password changed.\n?> ");
+                            print $new_sock 'PWOK:'.encode_base64("Password changed.\n?> ");
                         }
 		        elsif ($chk eq 'ILLE') {
 		            print $new_sock 'HELP:'.encode_base64("ILLE Wrong account or password!\n?> ");
@@ -145,7 +145,7 @@ sub change_password {
 
     foreach my $line (@user_list) {
         if ($line =~ /^$account:/) {
-            $line =~ s/^(?:$account:?)[^:]*/$password/;
+            $line =~ s/^($account:)[^:]*/$1$password/;
         }
     }
 
