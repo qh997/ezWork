@@ -21,7 +21,7 @@ my $paswd = '';
 my $paspt = '';
 my $commd = 'HELP';
 my $input = '';
-until ($input =~ m{^q$}i) {
+until ($commd eq 'HELP' && $input eq 'q') {
     my $serstr = talk();
 #    print "RECIVED ==> $serstr\n";
 
@@ -34,7 +34,6 @@ until ($input =~ m{^q$}i) {
 
             if ($s_cmd eq 'PWOK') {
                 $commd = 'HELP';
-#                print "$paswd <=> $paspt\n";
                 $paswd = $paspt;
             }
             $paspt = '';
@@ -60,7 +59,7 @@ $socket -> close() or die "Close Socket failed.$@";
 
 sub talk {
 #    print "SENDING ==> [$acunt:".$paswd.":$commd:".encode_base64($input)."]\n";
-    $socket -> send("$acunt:".$paswd.":$commd:".encode_base64($input)."\n", 0);
+    $socket -> send("$acunt:$paswd:$commd:".encode_base64($input)."\n", 0);
     $socket -> autoflush(1);
 
     my $sel = IO::Select -> new($socket);

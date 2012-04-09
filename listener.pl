@@ -7,7 +7,7 @@ use MIME::Base64;
 
 my $USERFILE = 'account.txt';
 my $HELPLIST = <<END;
-\t(a) Creat or modify account
+\t(a) Login creat or change account
 \t(s) Set or change password
 \t(p) Print your imformation
 \t(h) Show this help list
