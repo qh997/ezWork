@@ -6,7 +6,8 @@ use IO::Socket;
 use IO::Select;
 use MIME::Base64;
 
-my $SERVER = 'p-d2-gengs';
+my $SERVER = 'localhost';
+
 my $PORT   = '1200';
 
 my $socket = IO::Socket::INET->new(

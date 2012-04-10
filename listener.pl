@@ -17,7 +17,7 @@ END
 chomp $HELPLIST;
 
 my $main_sock = new IO::Socket::INET(
-    Localhost => 'p-d2-gengs',
+    Localhost => 'localhost',
     LocalPort => 1200,
     Proto     => 'tcp',
     Listen    => 5,
