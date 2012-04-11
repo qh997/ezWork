@@ -150,7 +150,7 @@ while (my $new_sock = $main_sock -> accept()) {
                         print $new_sock 'HELP:'.encode_base64("Nothing to change!\n?> ");
                     }
                     elsif ($e_cmd eq 'TASK') {
-                        set_information($account, 'txtTask', $message);
+                        set_info_field($account, 'txtTask', $message);
                         print $new_sock 'HELP:'.encode_base64("Project task has been set.\n?> ");
                     }
                 }
@@ -241,7 +241,7 @@ sub get_informations {
     }
 }
 
-sub set_information {
+sub set_info_field {
     my $account = shift;
     chomp $account;
     my $field = shift;
