@@ -17,6 +17,7 @@ my $socket = IO::Socket::INET->new(
 ) or die "Can not create socket connection to server : <$SERVER>.\n$@";
 
 my $acunt = '';
+my $acupt = '';
 my $paswd = '';
 my $paspt = '';
 my $commd = 'HELP';
@@ -33,7 +34,13 @@ until ($commd eq 'HELP' && $input eq 'q') {
             $commd = 'HELP';
             $paswd = $paspt;
         }
+        elsif ($s_cmd eq 'ACOK') {
+            $commd = 'HELP';
+            $acunt = $acupt;
+            $paswd = '';
+        }
         $paspt = '';
+        $acupt = '';
 
         print $msg;
         if ($acunt ne '') {
@@ -44,7 +51,7 @@ until ($commd eq 'HELP' && $input eq 'q') {
         $input = <STDIN>;
         chomp $input;
 
-	$acunt = $input if $commd eq 'ACNT';
+	$acupt = $input if $commd eq 'ACNT';
         if ($commd eq 'PSWD') {
 	    $paspt = encode_base64($input);
             chomp $paspt;

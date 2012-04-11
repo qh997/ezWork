@@ -9,12 +9,23 @@ my $USERFILE = 'accounts';
 my $HELPLIST = <<END;
 \t(a) Login creat or change account
 \t(s) Set or change password
-\t(p) Print your imformation
+\t(e) Edit informations
+\t(p) Print your informations
 \t(h) Show this help list
 \t(q) Quit
 ?> 
 END
 chomp $HELPLIST;
+
+my $EHELPLIST = <<END;
+\t(e task) Edit task
+\t(e project) Edit project name
+\t(e protask) Edit project task
+\t(e active) Edit activity type
+\t(e promod) Edit project mode
+?> 
+END
+chomp $EHELPLIST;
 
 my $main_sock = new IO::Socket::INET(
     'Localhost' => 'localhost',
@@ -60,21 +71,54 @@ while (my $new_sock = $main_sock -> accept()) {
                             print $new_sock 'HELP:'.encode_base64(get_account_information($account, $passwrd)."?> ");
                         }
                     }
+                    elsif ($message =~ /^e(?:\s+(.*?)\s*)?$/) {
+                        if (!$account) {
+                            print $new_sock 'HELP:'.encode_base64("Use 'a' to login frist.\n?> ");
+                        }
+                        elsif (check_password($account, $passwrd) ne 'LGIN') {
+		            print $new_sock 'HELP:'.encode_base64("Invalid password!\n?> ");
+                        }
+                        else {
+                            my $set_cmd = $1;
+                            if (!$set_cmd) {
+                                print $new_sock 'HELP:'.encode_base64($EHELPLIST);
+                            }
+                            elsif ($set_cmd =~ /^task$/) {
+                                print $new_sock 'E+TASK:'.encode_base64('Type the task text > ');
+                            }
+                            elsif ($set_cmd =~ /^project$/) {
+                            }
+                            elsif ($set_cmd =~ /^protask$/) {
+                            }
+                            elsif ($set_cmd =~ /^active$/) {
+                            }
+                            elsif ($set_cmd =~ /^promod$/) {
+                            }
+                            else {
+                                print $new_sock 'HELP:'.encode_base64("Invalid command, use 'e' for help.\n?> ");
+                            }
+                        }
+                    }
                     else {
                         print $new_sock 'HELP:'.encode_base64("Invalid command, use 'h' for help.\n?> ");
                     }
                 }
                 elsif ($command =~ /^(?:ACNT)$/) {
                     $message = decode_base64($message);
-                    my $acnt_flag = get_account($message);
-                    if ($acnt_flag eq 'NEW') {
-                        print $new_sock 'HELP:'.encode_base64("Creat account $message, password [neusoft]\n?> ");
-                    }
-                    elsif ($acnt_flag eq 'ILE') {
-                        print $new_sock 'HELP:'.encode_base64("Not allow empty username!\n?> ");
+                    if ($message =~ /:/) {
+                        print $new_sock 'HELP:'.encode_base64("Not allow [:] in account name!\n?> ");
                     }
                     else {
-                        print $new_sock 'HELP:'.encode_base64("Login as $message\n?> ");
+                        my $acnt_flag = get_account($message);
+                        if ($acnt_flag eq 'NEW') {
+                            print $new_sock 'ACOK:'.encode_base64("Creat account $message, password [neusoft]\n?> ");
+                        }
+                        elsif ($acnt_flag eq 'ILE') {
+                            print $new_sock 'HELP:'.encode_base64("Not allow empty username!\n?> ");
+                        }
+                        else {
+                            print $new_sock 'ACOK:'.encode_base64("Login as $message\n?> ");
+                        }
                     }
                 }
                 elsif ($command =~ /^(?:PSWD)$/) {
@@ -83,12 +127,12 @@ while (my $new_sock = $main_sock -> accept()) {
                     }
                     else {
 		        my $chk = check_password($account, $passwrd);
-                        if ($passwrd =~ /^\s*$/) {print "new pass\n";
+                        if ($passwrd =~ /^\s*$/) {
                             if (check_password($account, $message) eq 'LGIN') {
                                 print $new_sock 'PWOK:'.encode_base64("Password OK.\n?> ");
                             }
                             else {
-		                print $new_sock 'HELP:'.encode_base64("Invalid account or password!\n?> ");
+		                print $new_sock 'HELP:'.encode_base64("Invalid password!\n?> ");
                             }
                         }
                         elsif ($chk eq 'LGIN') {
@@ -96,8 +140,17 @@ while (my $new_sock = $main_sock -> accept()) {
                             print $new_sock 'PWOK:'.encode_base64("Password changed.\n?> ");
                         }
 		        elsif ($chk eq 'ILLE') {
-		            print $new_sock 'HELP:'.encode_base64("Invalid account or password!\n?> ");
+		            print $new_sock 'HELP:'.encode_base64("Invalid password!\n?> ");
 		        }
+                    }
+                }
+                elsif ($command =~ /^(?:E+)(.*)$/) {
+                    my $e_cmd = $1;
+		    if ($message =~ /^\s*$/) {
+                        print $new_sock 'HELP:'.encode_base64("Nothing to change!\n?> ");
+                    }
+                    elsif ($e_cmd eq 'TASK') {
+                        
                     }
                 }
             }
@@ -125,7 +178,7 @@ sub get_account {
         return 'NEW';
     }
 
-    return;
+    return '';
 }
 
 sub check_password {
@@ -138,7 +191,7 @@ sub check_password {
     my @user_list = <$UF>;
     close $UF;
 
-    if (my @ttt = grep(/^$account:$password:/, @user_list)) {
+    if ([grep(/^$account:$password:/, @user_list)]) {
         return 'LGIN';
     }
     else {
@@ -183,6 +236,25 @@ sub get_account_information {
         return $ifm;
     }
     else {
-        return "Invalid account or password!\n";
+        return "Invalid password!\n";
+    }
+}
+
+sub set_information {
+    my $account = shift;
+    chomp $account;
+    my $field = shift;
+    chomp $field;
+    my $value = shift;
+    chomp $value;
+
+    open my $UF, '< '.$USERFILE;
+    my @user_list = <$UF>;
+    close $UF;
+
+    foreach my $line (@user_list) {
+        if ($line =~ /^$account:/) {
+            
+        }
     }
 }
