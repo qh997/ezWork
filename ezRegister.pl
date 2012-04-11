@@ -23,6 +23,7 @@ my $EHELPLIST = <<END;
 \t(e protask) Edit project task
 \t(e active) Edit activity type
 \t(e promod) Edit project mode
+\t(e list) List all fields
 ?> 
 END
 chomp $EHELPLIST;
@@ -34,6 +35,10 @@ my $main_sock = new IO::Socket::INET(
     'Listen'    => 5,
     'Reuse'     => 1,
 ) or die "Could not connet : $!";
+
+my %FIELDSDEF = (
+    TASK => 'txtTask',
+);
 
 while (my $new_sock = $main_sock -> accept()) {
     if (my $pid = fork) {
@@ -94,6 +99,9 @@ while (my $new_sock = $main_sock -> accept()) {
                             }
                             elsif ($set_cmd =~ /^promod$/) {
                             }
+                            elsif ($set_cmd =~ /^list$/) {
+                                print $new_sock 'HELP:'.encode_base64(get_info_field($account)."\n?> ");
+                            }
                             else {
                                 print $new_sock 'HELP:'.encode_base64("Invalid command, use 'e' for help.\n?> ");
                             }
@@ -150,7 +158,7 @@ while (my $new_sock = $main_sock -> accept()) {
                         print $new_sock 'HELP:'.encode_base64("Nothing to change!\n?> ");
                     }
                     elsif ($e_cmd eq 'TASK') {
-                        set_info_field($account, 'txtTask', $message);
+                        set_info_field($account, $FIELDSDEF{$e_cmd}, $message);
                         print $new_sock 'HELP:'.encode_base64("Project task has been set.\n?> ");
                     }
                 }
@@ -192,7 +200,7 @@ sub check_password {
     my @user_list = <$UF>;
     close $UF;
 
-    if ([grep(/^$account:$password:/, @user_list)]) {
+    if (grep(/^$account:$password:/, @user_list)) {
         return 'LGIN';
     }
     else {
@@ -239,6 +247,38 @@ sub get_informations {
     else {
         return "Invalid password!\n";
     }
+}
+
+sub get_info_field {
+    my $account = shift;
+    chomp $account;
+    my $field = @_ ? shift : '';
+    chomp $field;
+
+    open my $UF, '< '.$USERFILE;
+    my @user_list = <$UF>;
+    close $UF;
+
+    my @lines = grep(/^$account:/, @user_list);
+    return "Account [$account] cannot found!" unless @lines;
+    my $line = shift @lines;
+
+    chomp $line;
+
+    my $retstr = '';
+    if ($field && $line =~ m/[:;]$field<(.*?);?$/) {
+        $retstr .= "$field = $1\n";
+    }
+    elsif ($field) {
+        $retstr .= "$field = null\n";
+    }
+    else {
+        foreach my $key (keys %FIELDSDEF) {
+            $retstr .= get_info_field($account, $FIELDSDEF{$key});
+        }
+    }
+
+    return $retstr;
 }
 
 sub set_info_field {
