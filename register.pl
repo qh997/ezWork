@@ -7,7 +7,6 @@ use IO::Select;
 use MIME::Base64;
 
 my $SERVER = 'localhost';
-
 my $PORT   = '1200';
 
 my $socket = IO::Socket::INET->new(
@@ -24,7 +23,6 @@ my $commd = 'HELP';
 my $input = '';
 until ($commd eq 'HELP' && $input eq 'q') {
     my $serstr = talk();
-#    print "RECIVED ==> $serstr\n";
 
     if ($serstr =~ /^(.*?):(.*)$/) {
         my $s_cmd = $1;
@@ -59,7 +57,6 @@ until ($commd eq 'HELP' && $input eq 'q') {
 $socket -> close() or die "Close Socket failed.$@";
 
 sub talk {
-#    print "SENDING ==> [$acunt:".$paswd.":$commd:".encode_base64($input)."]\n";
     $socket -> send("$acunt:$paswd:$commd:".encode_base64($input)."\n", 0);
     $socket -> autoflush(1);
 

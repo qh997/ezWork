@@ -17,11 +17,11 @@ END
 chomp $HELPLIST;
 
 my $main_sock = new IO::Socket::INET(
-    Localhost => 'localhost',
-    LocalPort => 1200,
-    Proto     => 'tcp',
-    Listen    => 5,
-    Reuse     => 1,
+    'Localhost' => 'localhost',
+    'LocalPort' => 1200,
+    'Proto'     => 'tcp',
+    'Listen'    => 5,
+    'Reuse'     => 1,
 ) or die "Could not connet : $!";
 
 while (my $new_sock = $main_sock -> accept()) {

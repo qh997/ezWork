@@ -1,0 +1,29 @@
+#!/bin/bash
+
+start()
+{
+    echo "start ezRegister"
+    /usr/local/bin/ezRegister.pl &
+    exit 0;
+}
+stop()
+{
+     pkill ezRegister.pl
+     echo "stop ezRegister"
+}
+
+case "$1" in
+start)
+    start
+    ;;
+stop)
+    stop
+    ;;
+restart)
+    stop
+    start
+    ;;
+*)
+    echo "usage: $0 start|stop|restart"
+    exit 0;
+esac
