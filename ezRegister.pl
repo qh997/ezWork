@@ -44,14 +44,21 @@ while (my $new_sock = $main_sock -> accept()) {
                     elsif ($message =~ /^a$/) {
                         print $new_sock 'ACNT:'.encode_base64('Input your email account > ');
                     }
-                    elsif (!$account) {
-                        print $new_sock 'HELP:'.encode_base64("Use 'a' to login frist.\n?> ");
-                    }
                     elsif ($message =~ /^s$/) {
-                        print $new_sock 'PSWD:'.encode_base64('Input your email password > ');
+                        if (!$account) {
+                            print $new_sock 'HELP:'.encode_base64("Use 'a' to login frist.\n?> ");
+                        }
+                        else {
+                            print $new_sock 'PSWD:'.encode_base64('Input your email password > ');
+                        }
                     }
                     elsif ($message =~ /^p$/) {
-                        print $new_sock 'HELP:'.encode_base64(get_account_information($account, $passwrd)."?> ");
+                        if (!$account) {
+                            print $new_sock 'HELP:'.encode_base64("Use 'a' to login frist.\n?> ");
+                        }
+                        else {
+                            print $new_sock 'HELP:'.encode_base64(get_account_information($account, $passwrd)."?> ");
+                        }
                     }
                     else {
                         print $new_sock 'HELP:'.encode_base64("Invalid command, use 'h' for help.\n?> ");

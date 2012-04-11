@@ -28,21 +28,19 @@ until ($commd eq 'HELP' && $input eq 'q') {
         my $s_cmd = $1;
 	my $msg = decode_base64($2);
 
-        if ($s_cmd ne 'EROR') {
-            $commd = $s_cmd;
-
-            if ($s_cmd eq 'PWOK') {
-                $commd = 'HELP';
-                $paswd = $paspt;
-            }
-            $paspt = '';
-        }
-        else {
+        $commd = $s_cmd;
+        if ($s_cmd eq 'PWOK') {
             $commd = 'HELP';
+            $paswd = $paspt;
         }
+        $paspt = '';
 
         print $msg;
-        print "[$acunt] " if $acunt ne '';
+        if ($acunt ne '') {
+            print "[$acunt";
+            print "*" if $paswd eq '';
+            print "] ";
+        }
         $input = <STDIN>;
         chomp $input;
 
