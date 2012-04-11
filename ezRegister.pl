@@ -68,7 +68,7 @@ while (my $new_sock = $main_sock -> accept()) {
                             print $new_sock 'HELP:'.encode_base64("Use 'a' to login frist.\n?> ");
                         }
                         else {
-                            print $new_sock 'HELP:'.encode_base64(get_account_information($account, $passwrd)."?> ");
+                            print $new_sock 'HELP:'.encode_base64(get_informations($account, $passwrd)."?> ");
                         }
                     }
                     elsif ($message =~ /^e(?:\s+(.*?)\s*)?$/) {
@@ -144,13 +144,14 @@ while (my $new_sock = $main_sock -> accept()) {
 		        }
                     }
                 }
-                elsif ($command =~ /^(?:E+)(.*)$/) {
+                elsif ($command =~ /^(?:E\+)(.*)$/) {
                     my $e_cmd = $1;
 		    if ($message =~ /^\s*$/) {
                         print $new_sock 'HELP:'.encode_base64("Nothing to change!\n?> ");
                     }
                     elsif ($e_cmd eq 'TASK') {
-                        
+                        set_information($account, 'txtTask', $message);
+                        print $new_sock 'HELP:'.encode_base64("Project task has been set.\n?> ");
                     }
                 }
             }
@@ -220,7 +221,7 @@ sub change_password {
     close $OH;
 }
 
-sub get_account_information {
+sub get_informations {
     my $account = shift;
     chomp $account;
     my $password = shift;
@@ -254,7 +255,20 @@ sub set_information {
 
     foreach my $line (@user_list) {
         if ($line =~ /^$account:/) {
-            
+            if ($line =~ /[:;]?$field</) {
+                $line =~ s/(?<=(;|:)$field<).*?(?=;|$)/$value/;
+            }
+            else {
+                print "\$line = $line\n";
+                $line =~ s/(?<!:|;)(?=\n)$/;/;
+                print "\$line = $line\n";
+                $line =~ s/(?<=:|;)(?=\n)$/$field<$value/;
+                print "\$line = $line\n";
+            }
         }
     }
+
+    open my $OH, '> '.$USERFILE;
+    print $OH join '', @user_list;
+    close $OH;
 }
