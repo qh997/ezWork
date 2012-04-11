@@ -5,7 +5,7 @@ use strict;
 use IO::Socket;
 use MIME::Base64;
 
-my $USERFILE = 'account.txt';
+my $USERFILE = 'accounts';
 my $HELPLIST = <<END;
 \t(a) Login creat or change account
 \t(s) Set or change password
