@@ -6,29 +6,35 @@ use IO::Socket;
 use MIME::Base64;
 
 my $USERFILE = 'accounts';
+
+my $WELCOME = <<END;
+======== WELCOME ========
+
+Use 'h' for help list.
+END
+chomp $WELCOME;
+
 my $HELPLIST = <<END;
 \t(a) Login creat or change account
-\t(s) Set or change password
-\t(e) Edit informations
+\t(s) Input or change password
+\t(i) Information edition command
 \t(p) Print your informations
 \t(h) Show this help list
 \t(q) Quit
-?> 
 END
 chomp $HELPLIST;
 
 my $EHELPLIST = <<END;
-\t(e task) Edit task
-\t(e project) Edit project name
-\t(e protask) Edit project task
-\t(e active) Edit activity type
-\t(e promod) Edit project mode
-\t(e list) List all fields
-?> 
+\t(i task) Set task
+\t(i project) Set project name
+\t(i protask) Set project task
+\t(i active) Set activity type
+\t(i promod) Set project mode
+\t(i list) List all fields
 END
 chomp $EHELPLIST;
 
-my $main_sock = new IO::Socket::INET(
+my $main_sock = IO::Socket::INET -> new(
     'Localhost' => 'localhost',
     'LocalPort' => 1200,
     'Proto'     => 'tcp',
@@ -52,44 +58,50 @@ while (my $new_sock = $main_sock -> accept()) {
                 my $command = $3;
                 my $message = $4;
 
-                if ($command =~ /^(?:HELP)$/) {
+                if ($command =~ /^(?:HELO)$/) {
+                    print $new_sock 'HELP:'.encode_base64($WELCOME."\n?> ", '');
+                }
+                elsif ($command =~ /^(?:HELP)$/) {
                     $message = decode_base64($message);
-                    if ($message =~ /^h?$/) {
-                        print $new_sock 'HELP:'.encode_base64($HELPLIST);
+                    if ($message =~ /^h$/) {
+                        print $new_sock 'HELP:'.encode_base64($HELPLIST."\n?> ", '');
+                    }
+                    elsif ($message =~ /^\s*$/) {
+                        print $new_sock 'HELP:'.encode_base64('?> ', '');
                     }
                     elsif ($message =~ /^a$/) {
-                        print $new_sock 'ACNT:'.encode_base64('Input your email account > ');
+                        print $new_sock 'ACNT:'.encode_base64('Input your email account > ', '');
                     }
                     elsif ($message =~ /^s$/) {
                         if (!$account) {
-                            print $new_sock 'HELP:'.encode_base64("Use 'a' to login frist.\n?> ");
+                            print $new_sock 'HELP:'.encode_base64("Use 'a' to login frist.\n?> ", '');
                         }
                         else {
-                            print $new_sock 'PSWD:'.encode_base64('Input your email password > ');
+                            print $new_sock 'PSWD:'.encode_base64('Input your email password > ', '');
                         }
                     }
                     elsif ($message =~ /^p$/) {
                         if (!$account) {
-                            print $new_sock 'HELP:'.encode_base64("Use 'a' to login frist.\n?> ");
+                            print $new_sock 'HELP:'.encode_base64("Use 'a' to login frist.\n?> ", '');
                         }
                         else {
-                            print $new_sock 'HELP:'.encode_base64(get_informations($account, $passwrd)."?> ");
+                            print $new_sock 'HELP:'.encode_base64(get_informations($account, $passwrd)."?> ", '');
                         }
                     }
-                    elsif ($message =~ /^e(?:\s+(.*?)\s*)?$/) {
+                    elsif ($message =~ /^i(?:\s+(.*?)\s*)?$/) {
                         if (!$account) {
-                            print $new_sock 'HELP:'.encode_base64("Use 'a' to login frist.\n?> ");
+                            print $new_sock 'HELP:'.encode_base64("Use 'a' to login frist.\n?> ", '');
                         }
                         elsif (check_password($account, $passwrd) ne 'LGIN') {
-		            print $new_sock 'HELP:'.encode_base64("Invalid password!\n?> ");
+                            print $new_sock 'HELP:'.encode_base64("Invalid password!\n?> ", '');
                         }
                         else {
                             my $set_cmd = $1;
                             if (!$set_cmd) {
-                                print $new_sock 'HELP:'.encode_base64($EHELPLIST);
+                                print $new_sock 'HELP:'.encode_base64($EHELPLIST."\n?> ", '');
                             }
                             elsif ($set_cmd =~ /^task$/) {
-                                print $new_sock 'E+TASK:'.encode_base64('Type the task text > ');
+                                print $new_sock 'I+TASK:'.encode_base64('Type the task text > ', '');
                             }
                             elsif ($set_cmd =~ /^project$/) {
                             }
@@ -100,66 +112,66 @@ while (my $new_sock = $main_sock -> accept()) {
                             elsif ($set_cmd =~ /^promod$/) {
                             }
                             elsif ($set_cmd =~ /^list$/) {
-                                print $new_sock 'HELP:'.encode_base64(get_info_field($account)."\n?> ");
+                                print $new_sock 'HELP:'.encode_base64(get_info_field($account)."\n?> ", '');
                             }
                             else {
-                                print $new_sock 'HELP:'.encode_base64("Invalid command, use 'e' for help.\n?> ");
+                                print $new_sock 'HELP:'.encode_base64("Invalid command, use 'e' for help.\n?> ", '');
                             }
                         }
                     }
                     else {
-                        print $new_sock 'HELP:'.encode_base64("Invalid command, use 'h' for help.\n?> ");
+                        print $new_sock 'HELP:'.encode_base64("Invalid command, use 'h' for help.\n?> ", '');
                     }
                 }
                 elsif ($command =~ /^(?:ACNT)$/) {
                     $message = decode_base64($message);
                     if ($message =~ /:/) {
-                        print $new_sock 'HELP:'.encode_base64("Not allow [:] in account name!\n?> ");
+                        print $new_sock 'HELP:'.encode_base64("Not allow [:] in account name!\n?> ", '');
                     }
                     else {
                         my $acnt_flag = get_account($message);
                         if ($acnt_flag eq 'NEW') {
-                            print $new_sock 'ACOK:'.encode_base64("Creat account $message, password [neusoft]\n?> ");
+                            print $new_sock 'ACOK:'.encode_base64("Creat account $message, password [neusoft]\n?> ", '');
                         }
                         elsif ($acnt_flag eq 'ILE') {
-                            print $new_sock 'HELP:'.encode_base64("Not allow empty username!\n?> ");
+                            print $new_sock 'HELP:'.encode_base64("Not allow empty username!\n?> ", '');
                         }
                         else {
-                            print $new_sock 'ACOK:'.encode_base64("Login as $message\n?> ");
+                            print $new_sock 'ACOK:'.encode_base64("Login as $message\n?> ", '');
                         }
                     }
                 }
                 elsif ($command =~ /^(?:PSWD)$/) {
                     if ($message =~ /^\s*$/) {
-                        print $new_sock 'HELP:'.encode_base64("Not allow empty password!\n?> ");
+                        print $new_sock 'HELP:'.encode_base64("Not allow empty password!\n?> ", '');
                     }
                     else {
-		        my $chk = check_password($account, $passwrd);
+                        my $chk = check_password($account, $passwrd);
                         if ($passwrd =~ /^\s*$/) {
                             if (check_password($account, $message) eq 'LGIN') {
-                                print $new_sock 'PWOK:'.encode_base64("Password OK.\n?> ");
+                                print $new_sock 'PWOK:'.encode_base64("Password OK.\n?> ", '');
                             }
                             else {
-		                print $new_sock 'HELP:'.encode_base64("Invalid password!\n?> ");
+                                print $new_sock 'HELP:'.encode_base64("Invalid password!\n?> ", '');
                             }
                         }
                         elsif ($chk eq 'LGIN') {
                             change_password($account, $message);
-                            print $new_sock 'PWOK:'.encode_base64("Password changed.\n?> ");
+                            print $new_sock 'PWOK:'.encode_base64("Password changed.\n?> ", '');
                         }
-		        elsif ($chk eq 'ILLE') {
-		            print $new_sock 'HELP:'.encode_base64("Invalid password!\n?> ");
-		        }
+                        elsif ($chk eq 'ILLE') {
+                            print $new_sock 'HELP:'.encode_base64("Invalid password!\n?> ", '');
+                        }
                     }
                 }
-                elsif ($command =~ /^(?:E\+)(.*)$/) {
+                elsif ($command =~ /^(?:I\+)(.*)$/) {
                     my $e_cmd = $1;
-		    if ($message =~ /^\s*$/) {
-                        print $new_sock 'HELP:'.encode_base64("Nothing to change!\n?> ");
+                    if ($message =~ /^\s*$/) {
+                        print $new_sock 'HELP:'.encode_base64("Nothing to change!\n?> ", '');
                     }
                     elsif ($e_cmd eq 'TASK') {
                         set_info_field($account, $FIELDSDEF{$e_cmd}, $message);
-                        print $new_sock 'HELP:'.encode_base64("Project task has been set.\n?> ");
+                        print $new_sock 'HELP:'.encode_base64("Project task has been set.\n?> ", '');
                     }
                 }
             }
@@ -299,11 +311,8 @@ sub set_info_field {
                 $line =~ s/(?<=(;|:)$field<).*?(?=;|$)/$value/;
             }
             else {
-                print "\$line = $line\n";
                 $line =~ s/(?<!:|;)(?=\n)$/;/;
-                print "\$line = $line\n";
                 $line =~ s/(?<=:|;)(?=\n)$/$field<$value/;
-                print "\$line = $line\n";
             }
         }
     }
