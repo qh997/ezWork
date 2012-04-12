@@ -8,7 +8,12 @@ use MIME::Base64;
 my $USERFILE = 'accounts';
 
 my $WELCOME = <<END;
-======== WELCOME ========
+
+*************************
+*                       *
+*        WELCOME        *
+*                       *
+*************************
 
 Use 'h' for help list.
 END
