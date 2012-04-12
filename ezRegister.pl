@@ -52,6 +52,7 @@ my $main_sock = IO::Socket::INET -> new(
 my %FIELDSDEF = (
     TASK => 'txtTask',
     PROJ => 'selProject',
+    PROT => 'selProTask',
 );
 
 while (my $new_sock = $main_sock -> accept()) {
@@ -200,7 +201,7 @@ while (my $new_sock = $main_sock -> accept()) {
                     }
                     elsif ($e_cmd eq 'TASK') {
                         set_info_field($account, $FIELDSDEF{$e_cmd}, $message);
-                        print $new_sock 'HELP:'.encode_base64("Project task has been set.\n?> ", '');
+                        print $new_sock 'HELP:'.encode_base64("Task has been set.\n?> ", '');
                     }
                     elsif ($e_cmd eq 'PROJ') {
                         my $dcmsg = decode_base64($message);
@@ -208,6 +209,17 @@ while (my $new_sock = $main_sock -> accept()) {
                         if ($check =~ /\($dcmsg\)/) {
                             set_info_field($account, $FIELDSDEF{$e_cmd}, $message);
                             print $new_sock 'HELP:'.encode_base64("Project has been set.\n?> ", '');
+                        }
+                        else {
+                            print $new_sock 'HELP:'.encode_base64("!!WARNING!!\nDO NOT input ILLEGAL values\n?> ", '');
+                        }
+                    }
+                    elsif ($e_cmd eq 'PROT') {
+                        my $dcmsg = decode_base64($message);
+                        my $check = get_field_def("account=$account;selProject=".get_field_info($account, $FIELDSDEF{'PROJ'}).';', $FIELDSDEF{$e_cmd});
+                        if ($check =~ /\($dcmsg\)/) {
+                            set_info_field($account, $FIELDSDEF{$e_cmd}, $message);
+                            print $new_sock 'HELP:'.encode_base64("Project task has been set.\n?> ", '');
                         }
                         else {
                             print $new_sock 'HELP:'.encode_base64("!!WARNING!!\nDO NOT input ILLEGAL values\n?> ", '');
