@@ -6,7 +6,7 @@ use IO::Socket;
 use MIME::Base64;
 
 my $USERFILE = 'accounts';
-my $USERSELS = '/home/gengs/study/perl/lwp/userselections';
+my $USERSELS = 'useroptions';
 
 my $WELCOME = <<END;
 
@@ -32,11 +32,11 @@ chomp $HELPLIST;
 
 my $EHELPLIST = <<END;
 \t(i task) Set task
-\t(i project) Set project name
-\t(i protask) Set project task
-\t(i active) Set activity type
-\t(i actsub) Set sub activity type
-\t(i promod) Set project mode
+\t(i proj) Set project
+\t(i prot) Set project task
+\t(i actv) Set activity type
+\t(i sact) Set sub activity type
+\t(i prom) Set project mode
 \t(i list) List all fields
 END
 chomp $EHELPLIST;
@@ -111,26 +111,40 @@ while (my $new_sock = $main_sock -> accept()) {
                             elsif ($set_cmd =~ /^task$/) {
                                 print $new_sock 'I+TASK:'.encode_base64('Type the task text ('.get_field_info($account, 'txtTask').')> ', '');
                             }
-                            elsif ($set_cmd =~ /^project$/) {
+                            elsif ($set_cmd =~ /^proj$/) {
                                 print $new_sock 'I+PROJ:'.encode_base64(
-                                    "    !!PAY ATTENTION!!\n".
-                                    "You SHOULD use the following values in the parentheses.\n".
+                                    "!!PAY ATTENTION!!\n".
+                                    "You SHOULD ONLY use the following values in the parentheses.\n".
                                     get_field_def("account=$account;", 'selProject').
                                     'Type the project number ('.
                                     get_field_info($account, 'selProject').')> '
                                 , '');
                             }
-                            elsif ($set_cmd =~ /^protask$/) {
+                            elsif ($set_cmd =~ /^prot$/) {
+                                if (my $project = get_field_info($account, 'selProject')) {
+                                    print $new_sock 'I+PROT:'.encode_base64(
+                                        "!!PAY ATTENTION!!\n".
+                                        "You SHOULD ONLY use the following values in the parentheses.\n".
+                                        get_field_def("account=$account;selProject=$project;", 'selProTask').
+                                        'Type the project number ('.
+                                        get_field_info($account, 'selProTask').')> '
+                                    , '');
+                                }
+                                else {
+                                    print $new_sock 'HELP:'.encode_base64("You should use 'i proj' to set project frist.\n?> ", '');
+                                }
                             }
-                            elsif ($set_cmd =~ /^active$/) {
+                            elsif ($set_cmd =~ /^actv$/) {
                             }
-                            elsif ($set_cmd =~ /^promod$/) {
+                            elsif ($set_cmd =~ /^sact$/) {
+                            }
+                            elsif ($set_cmd =~ /^prom$/) {
                             }
                             elsif ($set_cmd =~ /^list$/) {
                                 print $new_sock 'HELP:'.encode_base64(get_info_field($account)."\n?> ", '');
                             }
                             else {
-                                print $new_sock 'HELP:'.encode_base64("Invalid command, use 'e' for help.\n?> ", '');
+                                print $new_sock 'HELP:'.encode_base64("Invalid command, use 'i' for help.\n?> ", '');
                             }
                         }
                     }
@@ -189,9 +203,14 @@ while (my $new_sock = $main_sock -> accept()) {
                         print $new_sock 'HELP:'.encode_base64("Project task has been set.\n?> ", '');
                     }
                     elsif ($e_cmd eq 'PROJ') {
-                        if (check_field_value($account, $FIELDSDEF{$e_cmd}, $message)) {
+                        my $dcmsg = decode_base64($message);
+                        my $check = get_field_def("account=$account;", 'selProject');
+                        if ($check =~ /\($dcmsg\)/) {
                             set_info_field($account, $FIELDSDEF{$e_cmd}, $message);
-                            print $new_sock 'HELP:'.encode_base64("Project task has been set.\n?> ", '');
+                            print $new_sock 'HELP:'.encode_base64("Project has been set.\n?> ", '');
+                        }
+                        else {
+                            print $new_sock 'HELP:'.encode_base64("!!WARNING!!\nDO NOT input ILLEGAL values\n?> ", '');
                         }
                     }
                 }
