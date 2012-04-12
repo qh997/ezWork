@@ -34,6 +34,7 @@ my $EHELPLIST = <<END;
 \t(i project) Set project name
 \t(i protask) Set project task
 \t(i active) Set activity type
+\t(i actsub) Set sub activity type
 \t(i promod) Set project mode
 \t(i list) List all fields
 END
@@ -266,7 +267,7 @@ sub get_informations {
     }
 }
 
-sub get_info_field {
+sub get_field_info {
     my $account = shift;
     chomp $account;
     my $field = @_ ? shift : '';
