@@ -6,6 +6,7 @@ use IO::Socket;
 use MIME::Base64;
 
 my $USERFILE = 'accounts';
+my $USERSELS = '/home/gengs/study/perl/lwp/userselections';
 
 my $WELCOME = <<END;
 
@@ -50,6 +51,7 @@ my $main_sock = IO::Socket::INET -> new(
 
 my %FIELDSDEF = (
     TASK => 'txtTask',
+    PROJ => 'selProject',
 );
 
 while (my $new_sock = $main_sock -> accept()) {
@@ -107,9 +109,16 @@ while (my $new_sock = $main_sock -> accept()) {
                                 print $new_sock 'HELP:'.encode_base64($EHELPLIST."\n?> ", '');
                             }
                             elsif ($set_cmd =~ /^task$/) {
-                                print $new_sock 'I+TASK:'.encode_base64('Type the task text ('.get_info_field($account, 'txtTask').')> ', '');
+                                print $new_sock 'I+TASK:'.encode_base64('Type the task text ('.get_field_info($account, 'txtTask').')> ', '');
                             }
                             elsif ($set_cmd =~ /^project$/) {
+                                print $new_sock 'I+PROJ:'.encode_base64(
+                                    "    !!PAY ATTENTION!!\n".
+                                    "You SHOULD use the following values in the parentheses.\n".
+                                    get_field_def("account=$account;", 'selProject').
+                                    'Type the project number ('.
+                                    get_field_info($account, 'selProject').')> '
+                                , '');
                             }
                             elsif ($set_cmd =~ /^protask$/) {
                             }
@@ -178,6 +187,12 @@ while (my $new_sock = $main_sock -> accept()) {
                     elsif ($e_cmd eq 'TASK') {
                         set_info_field($account, $FIELDSDEF{$e_cmd}, $message);
                         print $new_sock 'HELP:'.encode_base64("Project task has been set.\n?> ", '');
+                    }
+                    elsif ($e_cmd eq 'PROJ') {
+                        if (check_field_value($account, $FIELDSDEF{$e_cmd}, $message)) {
+                            set_info_field($account, $FIELDSDEF{$e_cmd}, $message);
+                            print $new_sock 'HELP:'.encode_base64("Project task has been set.\n?> ", '');
+                        }
                     }
                 }
             }
@@ -265,6 +280,51 @@ sub get_informations {
     else {
         return "Invalid password!\n";
     }
+}
+
+sub get_field_def {
+    my $search = shift;
+    my $field = shift;
+
+    open my $SF, "< $USERSELS";
+    my @sf_arry = <$SF>;
+    close $SF;
+
+    my $account = $search;
+    $account =~ s/account=(.*?);.*/$1/;
+    $search =~ s/.*?=.*?;//;
+
+    my $sels = join '', @sf_arry;
+    unless ($sels =~ s/.*###$account###(.*?)###$account###.*/$1/s) {
+        print "Cannot found $account in $USERSELS";
+    }
+
+    my $level = 0;
+    while ($search =~ /(.*?)=(.*?);/g) {
+        my $sfield = $1;
+        my $svalue = $2;
+        $sels =~ s/.*^\*{$level}$svalue.*?\n(.*?)^\*{$level}[^*]+.*/$1/gsm;
+        $level++;
+    }
+
+    $sels =~ s/.*\*{$level}$field\n*(.*?)\*{$level}$field.*/$1/s;
+    my $retval = '';
+    while ($sels =~ /^\*{$level}([^*]+)$/gm) {
+        my $str = $1;
+
+        $str =~ /(.*?)=(.*)/;
+        $retval .= "    ($1)  $2\n";
+    }
+
+    return $retval;
+}
+
+sub check_field_value {
+    my $account = shift;
+    my $field = shift;
+    my $value = shift;
+
+    my $chkval = get_field_def($account);
 }
 
 sub get_field_info {
