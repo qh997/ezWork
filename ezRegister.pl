@@ -106,7 +106,7 @@ while (my $new_sock = $main_sock -> accept()) {
                                 print $new_sock 'HELP:'.encode_base64($EHELPLIST."\n?> ", '');
                             }
                             elsif ($set_cmd =~ /^task$/) {
-                                print $new_sock 'I+TASK:'.encode_base64('Type the task text > ', '');
+                                print $new_sock 'I+TASK:'.encode_base64('Type the task text ('.get_info_field($account, 'txtTask').')> ', '');
                             }
                             elsif ($set_cmd =~ /^project$/) {
                             }
@@ -284,14 +284,14 @@ sub get_info_field {
 
     my $retstr = '';
     if ($field && $line =~ m/[:;]$field<(.*?);?$/) {
-        $retstr .= "$field = $1\n";
+        $retstr .= decode_base64($1);
     }
     elsif ($field) {
-        $retstr .= "$field = null\n";
+        $retstr .= '';
     }
     else {
         foreach my $key (keys %FIELDSDEF) {
-            $retstr .= get_info_field($account, $FIELDSDEF{$key});
+            $retstr .= $FIELDSDEF{$key}.' = '.get_info_field($account, $FIELDSDEF{$key})."\n";
         }
     }
 
