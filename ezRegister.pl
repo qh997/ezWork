@@ -71,7 +71,7 @@ while (my $new_sock = $main_sock -> accept()) {
                 my $command = $3;
                 my $message = $4;
 
-                if ($command =~ /^(?:HELO)$/) {
+                if ($command =~ /^$/) {
                     print $new_sock 'HELP:'.encode_base64($WELCOME."\n?> ", '');
                 }
                 elsif ($command =~ /^(?:HELP)$/) {

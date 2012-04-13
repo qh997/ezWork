@@ -20,7 +20,7 @@ my $acunt = '';
 my $acupt = '';
 my $paswd = '';
 my $paspt = '';
-my $commd = 'HELO';
+my $commd = '';
 my $input = '';
 until ($commd eq 'HELP' && $input eq 'q') {
     my $serstr = talk();
