@@ -5,8 +5,8 @@ use strict;
 use LWP;
 
 my %USER = (
-    NAME => 'gengs',
-    PSWD => 'gengs@NEU3',
+    NAME => @_ ? shift : 'gengs',
+    PSWD => @_ ? shift : 'gengs@NEU3',
 );
 
 my %URLS = (
@@ -47,7 +47,6 @@ while ($project =~ m{<option value="(.*?)">(.*?)</option>}g) {
     my $proidx = $1;
     my $pronam = $2;
     $user_str .= "$proidx=$pronam\n";
-#    print $proidx.'='.$pronam."\n";
     $response = $browser -> post($URLS{DRDN}."?state=1&procode=$proidx", @HEAD);
     my $sels = $response -> content;
     while ($sels =~ m{parent.setDropOptions\(new Array\((.*?)\),\s*"(.*?)"\);}g) {
@@ -55,7 +54,6 @@ while ($project =~ m{<option value="(.*?)">(.*?)</option>}g) {
         my $sel_str = $1;
         next if $sel_name =~ /selActType2/;
         $user_str .= "*$sel_name\n";
-#        print "*$sel_name\n";
 
         $sel_str =~ s/'//g;
         my @sel = split ',', $sel_str;
@@ -67,13 +65,11 @@ while ($project =~ m{<option value="(.*?)">(.*?)</option>}g) {
             my $opnam = $sel[$index];
 
             $user_str .= "*$opidx=$opnam\n";
-#            print "*$opidx=$opnam\n";
             if ($sel_name =~ /selActType1/) {
                 $response = $browser -> post($URLS{DRDN}."?state=2&procode=$proidx&type1=$opidx", @HEAD);
                 my $act2_str = $response -> content;
                 if ($act2_str =~ m{parent.setDropOptions\(new Array\((.*?)\),\s*"selActType2"\);}) {
                     $user_str .= "**selActType2\n";
-#                    print "**selActType2\n";
                     $act2_str = $1;
                     $act2_str =~ s/'//g;
                     my @act2 = split ',', $act2_str;
@@ -84,7 +80,6 @@ while ($project =~ m{<option value="(.*?)">(.*?)</option>}g) {
                         next unless $act2opidx;
                         my $act2opnam = $act2[$act2index];
                         $user_str .= "**$act2opidx=$act2opnam\n";
-#                        print "**$act2opidx=$act2opnam\n";
                     }
                     $user_str .= "**selActType2\n";
                 }
@@ -106,7 +101,7 @@ unless ($filestr =~ s/###$USER{NAME}###.*###$USER{NAME}###\n+/$user_str/s) {
     $filestr .= $user_str;
 }
 
-open my $WH, '> userselections';
+open my $WH, '> useroptions';
 print $WH $filestr;
 close $WH;
 

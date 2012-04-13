@@ -180,6 +180,8 @@ while (my $new_sock = $main_sock -> accept()) {
                         if ($passwrd =~ /^\s*$/) {
                             if (check_password($account, $message) eq 'LGIN') {
                                 print $new_sock 'PWOK:'.encode_base64("Password OK.\n?> ", '');
+                                my $dcpasswd = decode_base64($message);
+                                `perl getuseroptions.pl "$account" "$dcpasswd"` if my $spid = fork();
                             }
                             else {
                                 print $new_sock 'HELP:'.encode_base64("Invalid password!\n?> ", '');
