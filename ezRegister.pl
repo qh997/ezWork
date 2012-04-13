@@ -17,6 +17,7 @@ my $WELCOME = <<END;
 *************************
 
 Use 'h' for help list.
+
 END
 chomp $WELCOME;
 
@@ -54,6 +55,7 @@ my %FIELDSDEF = (
     PROJ => 'selProject',
     PROT => 'selProTask',
     ACTV => 'selActType1',
+    SACT => 'selActType2',
     PROM => 'selModule1',
 );
 
@@ -152,6 +154,23 @@ while (my $new_sock = $main_sock -> accept()) {
                                 }
                             }
                             elsif ($set_cmd =~ /^sact$/) {
+                                if (my $project = get_field_info($account, 'selProject')) {
+                                    if (my $active = get_field_info($account, 'selActType1')) {
+                                        print $new_sock 'I+SACT:'.encode_base64(
+                                            "!!PAY ATTENTION!!\n".
+                                            "You SHOULD ONLY use the following values in the parentheses.\n".
+                                            get_field_def("account=$account;selProject=$project;selActType1=$active;", 'selActType2').
+                                            'Type the active number ('.
+                                            get_field_info($account, 'selActType2').')> '
+                                        , '');
+                                    }
+                                    else {
+                                        print $new_sock 'HELP:'.encode_base64("You should use 'i actv' to set active type frist.\n?> ", '');
+                                    }
+                                }
+                                else {
+                                    print $new_sock 'HELP:'.encode_base64("You should use 'i proj' to set project frist.\n?> ", '');
+                                }
                             }
                             elsif ($set_cmd =~ /^prom$/) {
                                 if (my $project = get_field_info($account, 'selProject')) {
@@ -282,6 +301,30 @@ while (my $new_sock = $main_sock -> accept()) {
                             if (!$check) {
                                 set_info_field($account, $FIELDSDEF{$e_cmd}, $message);
                                 print $new_sock 'HELP:'.encode_base64("Active has been set to empty.\n?> ", '');
+                            }
+                            else {
+                                print $new_sock 'HELP:'.encode_base64("Nothing has been changed.\n?> ", '');
+                            }
+                        }
+                        else {
+                            print $new_sock 'HELP:'.encode_base64("!!WARNING!!\nDO NOT input ILLEGAL values\n?> ", '');
+                        }
+                    }
+                    elsif ($e_cmd eq 'SACT') {
+                        my $dcmsg = decode_base64($message);
+                        my $check = get_field_def(
+                            "account=$account;selProject=".get_field_info($account, $FIELDSDEF{'PROJ'}).
+                            ";selActType1=".get_field_info($account, $FIELDSDEF{'ACTV'}).
+                            ';', $FIELDSDEF{$e_cmd}
+                        );
+                        if ($check =~ /\($dcmsg\)/) {
+                            set_info_field($account, $FIELDSDEF{$e_cmd}, $message);
+                            print $new_sock 'HELP:'.encode_base64("Project sub active type has been set.\n?> ", '');
+                        }
+                        elsif ($message =~ /^\s*$/) {
+                            if (!$check) {
+                                set_info_field($account, $FIELDSDEF{$e_cmd}, $message);
+                                print $new_sock 'HELP:'.encode_base64("Project sub active has been set to empty.\n?> ", '');
                             }
                             else {
                                 print $new_sock 'HELP:'.encode_base64("Nothing has been changed.\n?> ", '');
@@ -445,7 +488,6 @@ sub get_field_def {
 
     my $uservalue = get_field_info($account, $field);
     if ($uservalue) {
-        print "\$uservalue=$uservalue\n";
         $retval =~ s/^(\s+)(?=\($uservalue\))/  * /sm;
     }
 
