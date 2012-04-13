@@ -222,12 +222,14 @@ while (my $new_sock = $main_sock -> accept()) {
                 }
                 elsif ($command =~ /^(?:I\+)(.*)$/) {
                     my $e_cmd = $1;
-                    if ($message =~ /^\s*$/) {
-                        print $new_sock 'HELP:'.encode_base64("Nothing to change!\n?> ", '');
-                    }
-                    elsif ($e_cmd eq 'TASK') {
-                        set_info_field($account, $FIELDSDEF{$e_cmd}, $message);
-                        print $new_sock 'HELP:'.encode_base64("Task has been set.\n?> ", '');
+                    if ($e_cmd eq 'TASK') {
+                        if ($message =~ /^\s*$/) {
+                            print $new_sock 'HELP:'.encode_base64("Nothing to change!\n?> ", '');
+                        }
+                        else {
+                            set_info_field($account, $FIELDSDEF{$e_cmd}, $message);
+                            print $new_sock 'HELP:'.encode_base64("Task has been set.\n?> ", '');
+                        }
                     }
                     elsif ($e_cmd eq 'PROJ') {
                         my $dcmsg = decode_base64($message);
@@ -235,6 +237,15 @@ while (my $new_sock = $main_sock -> accept()) {
                         if ($check =~ /\($dcmsg\)/) {
                             set_info_field($account, $FIELDSDEF{$e_cmd}, $message);
                             print $new_sock 'HELP:'.encode_base64("Project has been set.\n?> ", '');
+                        }
+                        elsif ($message =~ /^\s*$/) {
+                            if (!$check) {
+                                set_info_field($account, $FIELDSDEF{$e_cmd}, $message);
+                                print $new_sock 'HELP:'.encode_base64("Project has been set to empty.\n?> ", '');
+                            }
+                            else {
+                                print $new_sock 'HELP:'.encode_base64("Nothing has been changed.\n?> ", '');
+                            }
                         }
                         else {
                             print $new_sock 'HELP:'.encode_base64("!!WARNING!!\nDO NOT input ILLEGAL values\n?> ", '');
@@ -247,6 +258,15 @@ while (my $new_sock = $main_sock -> accept()) {
                             set_info_field($account, $FIELDSDEF{$e_cmd}, $message);
                             print $new_sock 'HELP:'.encode_base64("Project task has been set.\n?> ", '');
                         }
+                        elsif ($message =~ /^\s*$/) {
+                            if (!$check) {
+                                set_info_field($account, $FIELDSDEF{$e_cmd}, $message);
+                                print $new_sock 'HELP:'.encode_base64("Project task has been set to empty.\n?> ", '');
+                            }
+                            else {
+                                print $new_sock 'HELP:'.encode_base64("Nothing has been changed.\n?> ", '');
+                            }
+                        }
                         else {
                             print $new_sock 'HELP:'.encode_base64("!!WARNING!!\nDO NOT input ILLEGAL values\n?> ", '');
                         }
@@ -258,6 +278,15 @@ while (my $new_sock = $main_sock -> accept()) {
                             set_info_field($account, $FIELDSDEF{$e_cmd}, $message);
                             print $new_sock 'HELP:'.encode_base64("Active has been set.\n?> ", '');
                         }
+                        elsif ($message =~ /^\s*$/) {
+                            if (!$check) {
+                                set_info_field($account, $FIELDSDEF{$e_cmd}, $message);
+                                print $new_sock 'HELP:'.encode_base64("Active has been set to empty.\n?> ", '');
+                            }
+                            else {
+                                print $new_sock 'HELP:'.encode_base64("Nothing has been changed.\n?> ", '');
+                            }
+                        }
                         else {
                             print $new_sock 'HELP:'.encode_base64("!!WARNING!!\nDO NOT input ILLEGAL values\n?> ", '');
                         }
@@ -268,6 +297,15 @@ while (my $new_sock = $main_sock -> accept()) {
                         if ($check =~ /\($dcmsg\)/) {
                             set_info_field($account, $FIELDSDEF{$e_cmd}, $message);
                             print $new_sock 'HELP:'.encode_base64("Project module has been set.\n?> ", '');
+                        }
+                        elsif ($message =~ /^\s*$/) {
+                            if (!$check) {
+                                set_info_field($account, $FIELDSDEF{$e_cmd}, $message);
+                                print $new_sock 'HELP:'.encode_base64("Project module has been set to empty.\n?> ", '');
+                            }
+                            else {
+                                print $new_sock 'HELP:'.encode_base64("Nothing has been changed.\n?> ", '');
+                            }
                         }
                         else {
                             print $new_sock 'HELP:'.encode_base64("!!WARNING!!\nDO NOT input ILLEGAL values\n?> ", '');
