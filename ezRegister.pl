@@ -44,7 +44,7 @@ chomp $EHELPLIST;
 
 my $main_sock = IO::Socket::INET -> new(
     'Localhost' => 'localhost',
-    'LocalPort' => 1200,
+    'LocalPort' => 8321,
     'Proto'     => 'tcp',
     'Listen'    => 5,
     'Reuse'     => 1,
