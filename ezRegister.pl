@@ -120,6 +120,7 @@ while (my $new_sock = $main_sock -> accept()) {
                                 print $new_sock 'I+PROJ:'.encode_base64(
                                     "!!PAY ATTENTION!!\n".
                                     "You SHOULD ONLY use the following values in the parentheses.\n".
+                                    "If the list is NULL, you can just press {enter} to set this field empty.\n\n".
                                     get_field_def("account=$account;", 'selProject').
                                     'Type the project number ('.
                                     get_field_info($account, 'selProject').')> '
@@ -130,6 +131,7 @@ while (my $new_sock = $main_sock -> accept()) {
                                     print $new_sock 'I+PROT:'.encode_base64(
                                         "!!PAY ATTENTION!!\n".
                                         "You SHOULD ONLY use the following values in the parentheses.\n".
+                                        "If the list is NULL, you can just press {enter} to set this field empty.\n\n".
                                         get_field_def("account=$account;selProject=$project;", 'selProTask').
                                         'Type the project number ('.
                                         get_field_info($account, 'selProTask').')> '
@@ -144,6 +146,7 @@ while (my $new_sock = $main_sock -> accept()) {
                                     print $new_sock 'I+ACTV:'.encode_base64(
                                         "!!PAY ATTENTION!!\n".
                                         "You SHOULD ONLY use the following values in the parentheses.\n".
+                                        "If the list is NULL, you can just press {enter} to set this field empty.\n\n".
                                         get_field_def("account=$account;selProject=$project;", 'selActType1').
                                         'Type the active number ('.
                                         get_field_info($account, 'selActType1').')> '
@@ -159,6 +162,7 @@ while (my $new_sock = $main_sock -> accept()) {
                                         print $new_sock 'I+SACT:'.encode_base64(
                                             "!!PAY ATTENTION!!\n".
                                             "You SHOULD ONLY use the following values in the parentheses.\n".
+                                        "If the list is NULL, you can just press {enter} to set this field empty.\n\n".
                                             get_field_def("account=$account;selProject=$project;selActType1=$active;", 'selActType2').
                                             'Type the active number ('.
                                             get_field_info($account, 'selActType2').')> '
@@ -177,6 +181,7 @@ while (my $new_sock = $main_sock -> accept()) {
                                     print $new_sock 'I+PROM:'.encode_base64(
                                         "!!PAY ATTENTION!!\n".
                                         "You SHOULD ONLY use the following values in the parentheses.\n".
+                                        "If the list is NULL, you can just press {enter} to set this field empty.\n\n".
                                         get_field_def("account=$account;selProject=$project;", 'selModule1').
                                         'Type the active number ('.
                                         get_field_info($account, 'selModule1').')> '
@@ -540,12 +545,17 @@ sub set_info_field {
 
     foreach my $line (@user_list) {
         if ($line =~ /^$account:/) {
-            if ($line =~ /[:;]?$field</) {
-                $line =~ s/(?<=(;|:)$field<).*?(?=;|$)/$value/;
+            if ($value) {
+                if ($line =~ /[:;]?$field</) {
+                    $line =~ s/(?<=(;|:)$field<).*?(?=;|$)/$value/;
+                }
+                else {
+                    $line =~ s/(?<!:|;)(?=\n)$/;/;
+                    $line =~ s/(?<=:|;)(?=\n)$/$field<$value/;
+                }
             }
             else {
-                $line =~ s/(?<!:|;)(?=\n)$/;/;
-                $line =~ s/(?<=:|;)(?=\n)$/$field<$value/;
+                $line =~ s/(?<=;|:)$field<[^;]*//;
             }
         }
     }
