@@ -180,16 +180,14 @@ while (my $new_sock = $main_sock -> accept()) {
                         if ($passwrd =~ /^\s*$/) {
                             if (check_password($account, $message) eq 'LGIN') {
                                 print $new_sock 'PWOK:'.encode_base64("Password OK.\n?> ", '');
-                                my $dcpasswd = decode_base64($message);
-                                `perl getuseroptions.pl "$account" "$dcpasswd"` if my $spid = fork();
                             }
                             else {
                                 print $new_sock 'HELP:'.encode_base64("Invalid password!\n?> ", '');
                             }
                         }
                         elsif ($chk eq 'LGIN') {
-                            change_password($account, $message);
-                            print $new_sock 'PWOK:'.encode_base64("Password changed.\n?> ", '');
+                            my $prt_str = change_password($account, $message);
+                            print $new_sock 'PWOK:'.encode_base64("$prt_str\n?> ", '');
                         }
                         elsif ($chk eq 'ILLE') {
                             print $new_sock 'HELP:'.encode_base64("Invalid password!\n?> ", '');
@@ -280,19 +278,29 @@ sub change_password {
     my $password = shift;
     chomp $password;
 
-    open my $UF, '< '.$USERFILE;
-    my @user_list = <$UF>;
-    close $UF;
+    my $dcpasswd = decode_base64($password);
+    my $chk_pass_ol = `perl getuseroptions.pl "$account" "$dcpasswd"`;
 
-    foreach my $line (@user_list) {
-        if ($line =~ /^$account:/) {
-            $line =~ s/^($account:)[^:]*/$1$password/;
-        }
+    if ($chk_pass_ol =~ /!ERROR! Invalid username or password!!/) {
+        return "!!WARNING!! Your new password can not be verified.\n"
+              ."            And the password will not change any more!";
     }
+    else{
+        open my $UF, '< '.$USERFILE;
+        my @user_list = <$UF>;
+        close $UF;
 
-    open my $OH, '> '.$USERFILE;
-    print $OH join '', @user_list;
-    close $OH;
+        foreach my $line (@user_list) {
+            if ($line =~ /^$account:/) {
+                $line =~ s/^($account:)[^:]*/$1$password/;
+            }
+        }
+
+        open my $OH, '> '.$USERFILE;
+        print $OH join '', @user_list;
+        close $OH;
+        return "Password has successfully changed";
+    }
 }
 
 sub get_informations {

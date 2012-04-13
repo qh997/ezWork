@@ -5,8 +5,8 @@ use strict;
 use LWP;
 
 my %USER = (
-    NAME => @_ ? shift : 'gengs',
-    PSWD => @_ ? shift : 'gengs@NEU3',
+    NAME => @ARGV ? shift @ARGV : 'gengs',
+    PSWD => @ARGV ? shift @ARGV : 'gengs@NEU3',
 );
 
 my %URLS = (
@@ -36,9 +36,14 @@ $logn_para .= '&password='.$USER{PSWD};
 $logn_para .= '&selLanguage=en_US&lawEmp=on';
 
 $response = $browser -> post($URLS{LOGN}.'?'.$logn_para, @HEAD);
-
 $response = $browser -> post($URLS{DLAD}, @HEAD);
 my $project = $response -> content;
+
+unless ($project) {
+    print "!ERROR! Invalid username or password!!\n";
+
+    exit 1;
+}
 $project =~ s{.*name="selProject" id="selProject".*?</OPTION>(.*?)</select>.*}{$1}s;
 
 my $user_str = "###$USER{NAME}###\n";
@@ -92,7 +97,7 @@ $user_str .= "selProject\n";
 $user_str .= "###$USER{NAME}###\n\n";
 print $user_str;
 
-open my $RH, '< userselections';
+open my $RH, '< useroptions';
 my @usfile = <$RH>;
 close $RH;
 
