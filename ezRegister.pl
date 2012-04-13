@@ -405,6 +405,12 @@ sub get_field_def {
         $retval .= "    ($1)  $2\n";
     }
 
+    my $uservalue = get_field_info($account, $field);
+    if ($uservalue) {
+        print "\$uservalue=$uservalue\n";
+        $retval =~ s/^(\s+)(?=\($uservalue\))/  * /sm;
+    }
+
     return $retval;
 }
 
