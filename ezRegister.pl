@@ -36,7 +36,7 @@ my $EHELPLIST = <<END;
 \t(i prot) Set project task
 \t(i actv) Set activity type
 \t(i sact) Set sub activity type
-\t(i prom) Set project mode
+\t(i prom) Set project module
 \t(i list) List all fields
 END
 chomp $EHELPLIST;
@@ -53,6 +53,8 @@ my %FIELDSDEF = (
     TASK => 'txtTask',
     PROJ => 'selProject',
     PROT => 'selProTask',
+    ACTV => 'selActType1',
+    PROM => 'selModule1',
 );
 
 while (my $new_sock = $main_sock -> accept()) {
@@ -136,13 +138,37 @@ while (my $new_sock = $main_sock -> accept()) {
                                 }
                             }
                             elsif ($set_cmd =~ /^actv$/) {
+                                if (my $project = get_field_info($account, 'selProject')) {
+                                    print $new_sock 'I+ACTV:'.encode_base64(
+                                        "!!PAY ATTENTION!!\n".
+                                        "You SHOULD ONLY use the following values in the parentheses.\n".
+                                        get_field_def("account=$account;selProject=$project;", 'selActType1').
+                                        'Type the active number ('.
+                                        get_field_info($account, 'selActType1').')> '
+                                    , '');
+                                }
+                                else {
+                                    print $new_sock 'HELP:'.encode_base64("You should use 'i proj' to set project frist.\n?> ", '');
+                                }
                             }
                             elsif ($set_cmd =~ /^sact$/) {
                             }
                             elsif ($set_cmd =~ /^prom$/) {
+                                if (my $project = get_field_info($account, 'selProject')) {
+                                    print $new_sock 'I+PROM:'.encode_base64(
+                                        "!!PAY ATTENTION!!\n".
+                                        "You SHOULD ONLY use the following values in the parentheses.\n".
+                                        get_field_def("account=$account;selProject=$project;", 'selModule1').
+                                        'Type the active number ('.
+                                        get_field_info($account, 'selModule1').')> '
+                                    , '');
+                                }
+                                else {
+                                    print $new_sock 'HELP:'.encode_base64("You should use 'i proj' to set project frist.\n?> ", '');
+                                }
                             }
                             elsif ($set_cmd =~ /^list$/) {
-                                print $new_sock 'HELP:'.encode_base64(get_info_field($account)."\n?> ", '');
+                                print $new_sock 'HELP:'.encode_base64(get_field_info($account)."\n?> ", '');
                             }
                             else {
                                 print $new_sock 'HELP:'.encode_base64("Invalid command, use 'i' for help.\n?> ", '');
@@ -220,6 +246,28 @@ while (my $new_sock = $main_sock -> accept()) {
                         if ($check =~ /\($dcmsg\)/) {
                             set_info_field($account, $FIELDSDEF{$e_cmd}, $message);
                             print $new_sock 'HELP:'.encode_base64("Project task has been set.\n?> ", '');
+                        }
+                        else {
+                            print $new_sock 'HELP:'.encode_base64("!!WARNING!!\nDO NOT input ILLEGAL values\n?> ", '');
+                        }
+                    }
+                    elsif ($e_cmd eq 'ACTV') {
+                        my $dcmsg = decode_base64($message);
+                        my $check = get_field_def("account=$account;selProject=".get_field_info($account, $FIELDSDEF{'PROJ'}).';', $FIELDSDEF{$e_cmd});
+                        if ($check =~ /\($dcmsg\)/) {
+                            set_info_field($account, $FIELDSDEF{$e_cmd}, $message);
+                            print $new_sock 'HELP:'.encode_base64("Active has been set.\n?> ", '');
+                        }
+                        else {
+                            print $new_sock 'HELP:'.encode_base64("!!WARNING!!\nDO NOT input ILLEGAL values\n?> ", '');
+                        }
+                    }
+                    elsif ($e_cmd eq 'PROM') {
+                        my $dcmsg = decode_base64($message);
+                        my $check = get_field_def("account=$account;selProject=".get_field_info($account, $FIELDSDEF{'PROJ'}).';', $FIELDSDEF{$e_cmd});
+                        if ($check =~ /\($dcmsg\)/) {
+                            set_info_field($account, $FIELDSDEF{$e_cmd}, $message);
+                            print $new_sock 'HELP:'.encode_base64("Project module has been set.\n?> ", '');
                         }
                         else {
                             print $new_sock 'HELP:'.encode_base64("!!WARNING!!\nDO NOT input ILLEGAL values\n?> ", '');
@@ -360,14 +408,6 @@ sub get_field_def {
     return $retval;
 }
 
-sub check_field_value {
-    my $account = shift;
-    my $field = shift;
-    my $value = shift;
-
-    my $chkval = get_field_def($account);
-}
-
 sub get_field_info {
     my $account = shift;
     chomp $account;
@@ -393,7 +433,7 @@ sub get_field_info {
     }
     else {
         foreach my $key (keys %FIELDSDEF) {
-            $retstr .= $FIELDSDEF{$key}.' = '.get_info_field($account, $FIELDSDEF{$key})."\n";
+            $retstr .= $FIELDSDEF{$key}.' = '.get_field_info($account, $FIELDSDEF{$key})."\n";
         }
     }
 
