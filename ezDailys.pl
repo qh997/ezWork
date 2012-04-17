@@ -4,8 +4,8 @@ use warnings;
 use strict;
 use MIME::Base64;
 
-my $USERFILE = 'accounts';
-my $USERSELS = 'useroptions';
+my $USERFILE = '/home/gengs/develops/npeditor/accounts';
+my $USERSELS = '/home/gengs/develops/npeditor/useroptions';
 
 my %FIELDSDEF = (
     TASK => 'txtTask',
