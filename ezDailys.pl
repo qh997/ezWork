@@ -4,6 +4,7 @@ use warnings;
 use strict;
 use MIME::Base64;
 
+my $SPECUSER = @ARGV ? shift : '';
 my $USERFILE = '/home/gengs/develops/npeditor/accounts';
 my $USERSELS = '/home/gengs/develops/npeditor/useroptions';
 
@@ -29,27 +30,29 @@ foreach my $l (@userlist) {
     chomp $line;
     if ($line =~ /^(.*?):(.*?):(.*)$/) {
         my $user_name = $1;
-        my $user_pass = decode_base64($2);
-        my $user_info = decode_base64($3);
+        if (!$SPECUSER || ($SPECUSER eq $user_name)) {
+            my $user_pass = decode_base64($2);
+            my $user_info = decode_base64($3);
 
-        print "Reporting for $user_name\n";
+            print "Reporting for $user_name\n";
 
-        my $chk_pass_ol = `perl getuseroptions.pl "$user_name" "$user_pass"`;
+            my $chk_pass_ol = `perl getuseroptions.pl "$user_name" "$user_pass"`;
 
-        if ($chk_pass_ol =~ /!ERROR! Invalid username or password!!/) {
-            print "!!WARNING!! Account [$user_name] can not be verified.\n";
-        }
-        else {
-            if (my $err = check_user_settings($user_name)) {
-                print "!!WARNING!! Account [$user_name] has wrong setting in field [$err].\n";
+            if ($chk_pass_ol =~ /!ERROR! Invalid username or password!!/) {
+                print "!!WARNING!! Account [$user_name] can not be verified.\n";
             }
             else {
-                my $reportstr = "perl ezDaily.pl '$user_name' '$user_pass' ";
-                foreach my $key ('TASK','PROJ','PROT','ACTV','SACT','PROM') {
-                    $reportstr .= "'".get_field_info($user_name, $FIELDSDEF{$key})."' ";
+                if (my $err = check_user_settings($user_name)) {
+                    print "!!WARNING!! Account [$user_name] has wrong setting in field [$err].\n";
                 }
-                print $reportstr."\n";
-                `$reportstr`;
+                else {
+                    my $reportstr = "perl ezDaily.pl '$user_name' '$user_pass' ";
+                    foreach my $key ('TASK','PROJ','PROT','ACTV','SACT','PROM') {
+                        $reportstr .= "'".get_field_info($user_name, $FIELDSDEF{$key})."' ";
+                    }
+                    print $reportstr."\n";
+                    `$reportstr`;
+                }
             }
         }
     }
@@ -104,7 +107,7 @@ sub get_field_def {
 
     my $sels = join '', @usersels;
     unless ($sels =~ s/.*###$account###(.*?)###$account###.*/$1/s) {
-        print "Cannot found $account in $USERSELS";
+        print "Cannot found $account in $USERSELS\n";
     }
 
     my $level = 0;
