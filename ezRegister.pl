@@ -237,7 +237,12 @@ while (my $new_sock = $main_sock -> accept()) {
                         }
                         elsif ($chk eq 'LGIN') {
                             my $prt_str = change_password($account, $message);
-                            print $new_sock 'PWOK:'.encode_base64("$prt_str\n?> ", '');
+                            if ($prt_str =~ m/successfully/) {
+                                print $new_sock 'PWOK:'.encode_base64("$prt_str\n?> ", '');
+                            }
+                            else {
+                                print $new_sock 'HELP:'.encode_base64("$prt_str\n?> ", '');
+                            }
                         }
                         elsif ($chk eq 'ILLE') {
                             print $new_sock 'HELP:'.encode_base64("Invalid password!\n?> ", '');
