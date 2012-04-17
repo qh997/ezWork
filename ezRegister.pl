@@ -216,6 +216,9 @@ while (my $new_sock = $main_sock -> accept()) {
                         elsif ($acnt_flag eq 'ILE') {
                             print $new_sock 'HELP:'.encode_base64("Not allow empty username!\n?> ", '');
                         }
+                        elsif ($acnt_flag eq 'ERR') {
+                            print $new_sock 'HELP:'.encode_base64("Do not use '\@'!\n?> ", '');
+                        }
                         else {
                             print $new_sock 'ACOK:'.encode_base64("Login as $message\n?> ", '');
                         }
@@ -384,7 +387,10 @@ sub get_account {
     my @user_list = <$UF>;
     close $UF;
 
-    unless (grep(/^$account/, @user_list)) {
+    if ($account =~ /[:?\@#\$]/) {
+        return 'ERR';
+    }
+    elsif (!grep(/^$account/, @user_list)) {
         my $save_str = $account;
         `echo "$save_str:bmV1c29mdA==:" >> $USERFILE`;
         return 'NEW';
