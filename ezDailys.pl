@@ -143,7 +143,7 @@ sub get_field_info {
     chomp $line;
 
     my $retstr = '';
-    if ($field && $line =~ m/[:;]$field<(.*?);?$/) {
+    if ($field && $line =~ m/[:;]$field<(.*?)(?:;|$)/) {
         $retstr .= decode_base64($1);
     }
     elsif ($field) {
