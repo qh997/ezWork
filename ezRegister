@@ -3,8 +3,8 @@
 start()
 {
     echo "start ezRegister"
-    cd /home/gengs/npeditor/
-    /home/gengs/npeditor/ezRegister.pl &
+    cd /home/gengs/develops/npeditor/
+    /home/gengs/develops/npeditor/ezRegister.pl &
     exit 0;
 }
 stop()
