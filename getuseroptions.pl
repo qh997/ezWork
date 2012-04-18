@@ -97,7 +97,7 @@ $user_str .= "selProject\n";
 $user_str .= "###$USER{NAME}###\n\n";
 print $user_str;
 
-open my $RH, '< useroptions';
+open my $RH, '< /home/gengs/develops/ezWork/useroptions';
 my @usfile = <$RH>;
 close $RH;
 
@@ -106,7 +106,7 @@ unless ($filestr =~ s/###$USER{NAME}###.*###$USER{NAME}###\n+/$user_str/s) {
     $filestr .= $user_str;
 }
 
-open my $WH, '> useroptions';
+open my $WH, '> /home/gengs/develops/ezWork/useroptions';
 print $WH $filestr;
 close $WH;
 
