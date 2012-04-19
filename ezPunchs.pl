@@ -5,8 +5,8 @@ use strict;
 my $SPECUSER = @ARGV ? shift : '';
 my $USERFILE = '/home/gengs/develops/ezWork/accountpunchs';
 
-my $NOW_DATE = 20120420;#now_date();
-my $NOW_WEEK = 5;#now_week();
+my $NOW_DATE = now_date();
+my $NOW_WEEK = now_week();
 
 my $EXPCT = 60 * 28 + 18;
 my $VARIN = 60 *  4 + 27;
@@ -111,6 +111,5 @@ sub judgment_range {
 
     return 1 if $value && $lower < $value && $value < $upper;
 
-#    print $value." : out of $lower, $upper\n" if $value;
     return 0;
 }
