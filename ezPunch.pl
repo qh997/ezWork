@@ -50,7 +50,7 @@ $logn_para .= '&'.$pass_id.'='.$USER{PASS};
 $response = $browser -> post("$URLS{LOGN}?$logn_para", @HEAD);
 if ($response -> content =~ /href=".*?\?(error=.*?)"/) {
     print "Receive error code when login : $1\n";
-    exit 1;
+    exit 0;
 }
 
 $response = $browser -> get($URLS{MAIN}, @HEAD);
@@ -60,3 +60,5 @@ $tempoid =~ s/.*name="currentempoid"\s+value="(.*?)".*/$1/s;
 my $rcod_para = 'currentempoid='.$tempoid;
 
 $response = $browser -> post("$URLS{RCOD}?$rcod_para", @HEAD);
+
+exit 0;
