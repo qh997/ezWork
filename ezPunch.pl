@@ -5,7 +5,7 @@ use LWP;
 
 my %USER = (
     NAME => @ARGV ? shift : 'gengs',
-    PASS => @ARGV ? shift : 'gengs@NEU3',
+    PASS => @ARGV ? shift : '',
 );
 
 my %URLS = (
@@ -48,6 +48,11 @@ $logn_para .= '&'.$name_id.'='.$USER{NAME};
 $logn_para .= '&'.$pass_id.'='.$USER{PASS};
 
 $response = $browser -> post("$URLS{LOGN}?$logn_para", @HEAD);
+if ($response -> content =~ /href=".*?\?(error=.*?)"/) {
+    print "Receive error code when login : $1\n";
+    exit 1;
+}
+
 $response = $browser -> get($URLS{MAIN}, @HEAD);
 
 my $tempoid = $response -> content;
