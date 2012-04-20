@@ -49,8 +49,8 @@ $logn_para .= '&'.$pass_id.'='.$USER{PASS};
 
 $response = $browser -> post("$URLS{LOGN}?$logn_para", @HEAD);
 if ($response -> content =~ /href=".*?\?(error=.*?)"/) {
-    print "Receive error code when login : $1\n";
-    exit 0;
+    print $USER{NAME}.":Receive error code when login : $1\n";
+    exit 1;
 }
 
 $response = $browser -> get($URLS{MAIN}, @HEAD);

@@ -25,6 +25,8 @@ foreach my $user (@userlist) {
         my $user_pass = $2;
         my @user_time = split ';', $3;
 
+        next if ($SPECUSER && ($SPECUSER ne $user_name));
+
         my $activity = '';
         foreach my $date_def (@user_time) {
             if (!$activity && $date_def =~ /^(\d+)-(\d+)$/) {
@@ -47,18 +49,22 @@ foreach my $user (@userlist) {
                 $activity = $date =~ /^\d$/ ? $date != $NOW_WEEK
                                             : $date != $NOW_DATE;
             }
-            print "$user_name : $date_def => $activity\n";
         }
 
         if ($activity) {
             my $run_time = get_normal_distribution($EXPCT, $VARIN, $RANGE, $ROUND);
 
-            print "sleep $run_time\n";
-            my $fail = 5;
-            while ($fail) {
-                system('/home/gengs/develops/ezWork/ezPunch.pl') ? ($fail--) : ($fail = 0);
+            my $pid = fork();
+            if (defined $pid && $pid == 0) {
+                print "$user_name sleep $run_time\n";
+                my $fail = 5;
+                while ($fail) {
+                    system("/home/gengs/develops/ezWork/ezPunch.pl '$user_name' '$user_pass'") ? ($fail--) : ($fail = 0);
 
-                sleep 2 if $fail;
+                    sleep 2 if $fail;
+                }
+
+                exit 0;
             }
         }
         else {
@@ -66,6 +72,10 @@ foreach my $user (@userlist) {
         }
     }
 }
+
+wait();
+sleep 1;
+print "Finished.\n";
 
 sub now_date {
     my $NowTime = time();
