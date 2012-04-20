@@ -69,9 +69,9 @@ sub talk {
     while (my @ready = $sel -> can_read) {
         foreach my $fh (@ready) {
             if ($fh == $socket) {
-                 $fh -> recv(my $line, 81192);
-                 $line =~ s/\n//g;
-                 return $line;
+                $fh -> recv(my $line, 81192);
+                $line =~ s/\n//g;
+                return $line;
             }
         }
     }    
