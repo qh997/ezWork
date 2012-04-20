@@ -7,14 +7,14 @@ use LWP;
 my $NOW_DATE = now_date();
 
 my %USER = (
-    NAME => @ARGV ? shift : 'gengs',
-    PSWD => @ARGV ? shift : 'gengs@NEU3',
-    TASK => @ARGV ? shift : 'SCM working',
-    PROJ => @ARGV ? shift : '1014680',
-    PROT => @ARGV ? shift : '442537',
-    ACT1 => @ARGV ? shift : '30523',
-    ACT2 => @ARGV ? shift : '32892',
-    MOD1 => @ARGV ? shift : '81884',
+    NAME => @ARGV ? shift : '',
+    PSWD => @ARGV ? shift : '',
+    TASK => @ARGV ? shift : '',
+    PROJ => @ARGV ? shift : '',
+    PROT => @ARGV ? shift : '',
+    ACT1 => @ARGV ? shift : '',
+    ACT2 => @ARGV ? shift : '',
+    MOD1 => @ARGV ? shift : '',
 );
 
 my %URLS = (
