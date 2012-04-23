@@ -3,6 +3,7 @@
 use warnings;
 use strict;
 use LWP;
+use URL::Encode;
 
 my %USER = (
     NAME => @ARGV ? shift @ARGV : 'gengs',
@@ -32,7 +33,7 @@ push @HEAD, (Cookie => $cookie);
 
 my $logn_para = 'state=login';
 $logn_para .= '&username='.$USER{NAME};
-$logn_para .= '&password='.$USER{PSWD};
+$logn_para .= '&password='.URL::Encode::url_encode($USER{PSWD});
 $logn_para .= '&selLanguage=en_US&lawEmp=on';
 
 $response = $browser -> post($URLS{LOGN}.'?'.$logn_para, @HEAD);

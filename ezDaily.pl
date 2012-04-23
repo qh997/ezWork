@@ -3,6 +3,7 @@
 use warnings;
 use strict;
 use LWP;
+use URL::Encode;
 
 my $NOW_DATE = now_date();
 
@@ -40,14 +41,14 @@ push @HEAD, (Cookie => $cookie);
 
 my $logn_para = 'state=login';
 $logn_para .= '&username='.$USER{NAME};
-$logn_para .= '&password='.$USER{PSWD};
+$logn_para .= '&password='.URL::Encode::url_encode($USER{PSWD});
 $logn_para .= '&selLanguage=en_US&lawEmp=on';
 
 $response = $browser -> post($URLS{LOGN}.'?'.$logn_para, @HEAD);
 
 my $rpot_para = 'hidState=saveBack';
 $rpot_para .= '&txtDate='.$NOW_DATE;
-$rpot_para .= '&txtTask='.$USER{TASK};
+$rpot_para .= '&txtTask='.URL::Encode::url_encode($USER{TASK});
 $rpot_para .= '&txtTime=8&txtWorkLoad=';
 $rpot_para .= '&selProject='.$USER{PROJ};
 $rpot_para .= '&attribute1=&selProTask='.$USER{PROT};

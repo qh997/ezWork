@@ -2,10 +2,11 @@
 use warnings;
 use strict;
 use LWP;
+use URL::Encode;
 
 my %USER = (
     NAME => @ARGV ? shift : 'gengs',
-    PASS => @ARGV ? shift : '',
+    PSWD => @ARGV ? shift : '',
 );
 
 my %URLS = (
@@ -45,7 +46,7 @@ $logn_para .= '&neusoft_attendance_online=';
 $logn_para .= '&KEY'.$neusoft_key.'=';
 $logn_para .= '&neusoft_key=ID'.$neusoft_key.'PWD'.$neusoft_key;
 $logn_para .= '&'.$name_id.'='.$USER{NAME};
-$logn_para .= '&'.$pass_id.'='.$USER{PASS};
+$logn_para .= '&'.$pass_id.'='.URL::Encode::url_encode($USER{PSWD});
 
 $response = $browser -> post("$URLS{LOGN}?$logn_para", @HEAD);
 if ($response -> content =~ /href=".*?\?(error=.*?)"/) {

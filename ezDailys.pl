@@ -36,7 +36,7 @@ foreach my $l (@userlist) {
 
             print "Reporting for $user_name\n";
 
-            my $chk_pass_ol = `perl /home/gengs/develops/ezWork/getuseroptions.pl "$user_name" "$user_pass"`;
+            my $chk_pass_ol = `perl /home/gengs/develops/ezWork/getuseroptions.pl '$user_name' '$user_pass'`;
 
             if ($chk_pass_ol =~ /!ERROR! Invalid username or password!!/) {
                 print "!!WARNING!! Account [$user_name] can not be verified.\n";

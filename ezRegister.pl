@@ -424,7 +424,7 @@ sub change_password {
     chomp $password;
 
     my $dcpasswd = decode_base64($password);
-    my $chk_pass_ol = `perl getuseroptions.pl "$account" "$dcpasswd"`;
+    my $chk_pass_ol = `perl getuseroptions.pl '$account' '$dcpasswd'`;
 
     if ($chk_pass_ol =~ /!ERROR! Invalid username or password!!/) {
         return "!!WARNING!! Your new password can not be verified.\n"
