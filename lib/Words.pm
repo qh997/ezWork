@@ -1,4 +1,4 @@
-package words;
+package Words;
 
 use warnings;
 use strict;

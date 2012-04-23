@@ -6,7 +6,8 @@ use IO::Socket;
 use MIME::Base64;
 
 BEGIN {push @INC, q[./lib]};
-use general;
+use General;
+use UserCommand;
 
 my %CFGS = get_configs();
 
