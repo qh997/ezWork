@@ -5,14 +5,18 @@ use strict;
 require Exporter;
 use version;
 
+use words;
+
 our $VERSION = qv('0.0.1');
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw();
+our @EXPORT = qw(
+    get_configs
+);
 
 my $CONFIG_FILE = 'ezWork.config';
 
-sub get_config {
+sub get_configs {
     open my $CF, "< $CONFIG_FILE";
     my @file_content = <$CF>;
     close $CF;
