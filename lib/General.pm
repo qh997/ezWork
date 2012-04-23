@@ -2,16 +2,18 @@ package General;
 
 use warnings;
 use strict;
-require Exporter;
 use version;
-
 our $VERSION = qv('0.0.1');
 
+require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(
+    $DEBUG
     get_configs
+    debug
 );
 
+our $DEBUG = 1;
 my $CONFIG_FILE = 'ezWork.config';
 
 sub get_configs {
@@ -23,12 +25,18 @@ sub get_configs {
     foreach my $line (@file_content) {
         chomp $line;
 
-        if ($line =~ m{(.*?)=(.*)}) {
+        if ($line =~ m{^\s*(.*?)\s*=\s*(.*?)\s*$}) {
             $configs{$1} = $2;
         }
     }
 
     return %configs;
+}
+
+sub debug {
+    my $string = shift;
+    
+    print $string."\n" if $DEBUG;
 }
 
 return 1;

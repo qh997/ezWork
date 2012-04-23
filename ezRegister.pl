@@ -10,6 +10,7 @@ use General;
 use UserCommand;
 
 my %CFGS = get_configs();
+debug('Starting at localhost:'.$CFGS{PORT});
 
 my $main_socket = IO::Socket::INET -> new(
     'Localhost' => 'localhost',
@@ -17,12 +18,14 @@ my $main_socket = IO::Socket::INET -> new(
     'Proto'     => 'tcp',
     'Listen'    => '5',
     'Reuse'     => '1',
-) or die "Could not connet : $!";
+) or die "Could not start : $!";
 
 while (my $new_socket = $main_socket -> accept()) {
     my $pid = fork();
     if (defined($pid) && $pid == 0) {
         start($new_socket);
+        
+        exit 0;
     }
 }
 
@@ -31,6 +34,9 @@ sub start {
 
     while (defined(my $buf = <$socket>)) {
         chomp $buf;
-        print $socket -> peerhost()." => $buf\n";
+        debug($socket -> peerhost().' => '.$buf);
+        
+        my $user_cmd = UserCommand -> new(command => $buf);
+        debug('status = '.$user_cmd -> status.' - '.$user_cmd -> status_line);
     }
 }
