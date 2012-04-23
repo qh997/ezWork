@@ -6,8 +6,9 @@ use IO::Socket;
 use IO::Select;
 use MIME::Base64;
 
-my $SERVER = 'backup1';
+my $SERVER = @ARGV ? shift : 'backup1';
 my $PORT   = '8321';
+chomp $SERVER;
 
 my $socket = IO::Socket::INET -> new(
     PeerAddr => $SERVER,
