@@ -21,6 +21,16 @@ my $main_socket = IO::Socket::INET -> new(
 
 while (my $new_socket = $main_socket -> accept()) {
     my $pid = fork();
-    if (defined $pid && $pid == 0) {
+    if (defined($pid) && $pid == 0) {
+        start($new_socket);
+    }
+}
+
+sub start {
+    my $socket = shift;
+
+    while (defined(my $buf = <$socket>)) {
+        chomp $buf;
+        print $socket -> peerhost()." => $buf\n";
     }
 }

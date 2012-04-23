@@ -5,8 +5,6 @@ use strict;
 require Exporter;
 use version;
 
-use words;
-
 our $VERSION = qv('0.0.1');
 
 our @ISA = qw(Exporter);
