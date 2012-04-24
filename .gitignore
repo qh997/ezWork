@@ -3,3 +3,6 @@
 accounts
 useroptions
 accountpunchs
+*.old
+*.config
+module_test.pl
