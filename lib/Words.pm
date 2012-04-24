@@ -8,7 +8,7 @@ use version;
 our $VERSION = qv('0.0.1');
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw (get_welcome get_word);
+our @EXPORT = qw(get_welcome get_word);
 
 my $WELCOME = <<END;
 \t***************************
@@ -21,7 +21,7 @@ my $WELCOME = <<END;
 Use 'h' for help list.
 END
 
-our $HELP = <<END;
+our $HELPLIST = <<END;
     (a) Login creat or change account
     (s) Input or change password
     (i) Information edition command
@@ -30,7 +30,7 @@ our $HELP = <<END;
     (q) Quit
 END
 
-our $IHELP = <<END;
+our $IHELPLIST = <<END;
     (i task) Set task
     (i proj) Set project
     (i prot) Set project task

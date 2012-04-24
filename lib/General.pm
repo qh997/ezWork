@@ -10,11 +10,13 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(
     $DEBUG
+    %STATUS
     get_configs
     debug
 );
 
 our $DEBUG = 1;
+
 my $CONFIG_FILE = 'ezWork.config';
 
 sub get_configs {
