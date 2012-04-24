@@ -37,7 +37,7 @@ sub start {
         debug($socket -> peerhost().' => '.$buf);
         
         my $user_cmd = UserCommand -> new(command => $buf);
-        debug('status = '.$user_cmd -> status.' - '.$user_cmd -> status_line);
+#        debug('status = '.$user_cmd -> status.' - '.$user_cmd -> status_line);
 
         print $socket $user_cmd -> response();
     }

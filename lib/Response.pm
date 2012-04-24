@@ -18,6 +18,7 @@ my %MOVEMENT = (
 use Class::Std::Utils; {
     my %user;
     my %command;
+    my %result;
 
     sub new {
         my $class = shift;
@@ -28,6 +29,7 @@ use Class::Std::Utils; {
             type => '',
             content => '',
         };
+        $result{ident $self} = '';
         
         return $self;
     }
@@ -47,6 +49,8 @@ use Class::Std::Utils; {
         if (keys %args) {
             $command{ident $self}{type} = $args{type} if $args{type};
             $command{ident $self}{content} = $args{content} if $args{content};
+            $command{ident $self}{content} =~ s/^\s+//;
+            $command{ident $self}{content} =~ s/\s+$//;
         }
 
         return {
@@ -55,6 +59,31 @@ use Class::Std::Utils; {
         };
     }
 
+    sub analyze {
+        my $self = shift;
+
+        if ($command{ident $self}{type} eq '') {
+            $result{ident $self} = _get_next()._encode64(get_welcome().$PROMPT);
+        }
+        elsif ($command{ident $self}{type} eq 'HELP') {
+            if (!$command{ident $self}{content}) {
+                $result{ident $self} = _get_next()._encode64($PROMPT);
+            }
+            elsif ($command{ident $self}{content} =~ /^h$/i) {
+                $result{ident $self} = _get_next()._encode64(get_word('HELPLIST').$PROMPT);
+            }
+            elsif ($command{ident $self}{content} =~ /^i$/i) {
+                $result{ident $self} = _get_next()._encode64(get_word('IHELPLIST').$PROMPT);
+            }
+        }
+    }
+
+    sub get_result {
+        my $self = shift;
+
+        return $result{ident $self};
+    }
+=del
     sub get_static_response {
         my $self = shift;
         my $static_words = shift;
@@ -80,6 +109,7 @@ use Class::Std::Utils; {
     sub get_set_response {
         my $self = shift;
     }
+=cut
 
     sub _get_next {
         my $self = shift;
@@ -87,7 +117,6 @@ use Class::Std::Utils; {
 
         return $MOVEMENT{$current}.':';
     }
-
     sub _encode64 {
         my $input = shift;
 

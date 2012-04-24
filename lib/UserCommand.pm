@@ -8,7 +8,7 @@ our $VERSION = qv('0.0.1');
 
 use General;
 use Response;
-
+=del
 my %STATUS = (
     E01 => 'Unknow error',
     E02 => 'Bad of command format',
@@ -34,16 +34,18 @@ my %SETINFOS = (
     'sact' => 'selActType2',
     'prom' => 'selModule1',
 );
-
+=cut
 use Class::Std::Utils; {
+    my %user;
     my %status;
     my %resp;
 
     sub new {
         my ($class, %args) = @_;
         my $self = bless anon_scalar(), $class;
-        
-        $status{ident $self} = 'E01';
+
+        $user{ident $self} = User -> new();
+        $status{ident $self} = '';
         $resp{ident $self} = Response -> new();
         
         $self -> command_analyze(cmd => $args{command}) if $args{command};
@@ -57,8 +59,9 @@ use Class::Std::Utils; {
         
         if ($args{cmd} =~ /^(.*?):(.*?):(.*?):(.*?)$/) {
             $resp{ident $self} -> user(account => $1, password => decode_base64($2));
-            my $command = $resp{ident $self} -> command(type => $3, content => decode_base64($4));
-            
+            $resp{ident $self} -> command(type => $3, content => decode_base64($4));
+            $resp{ident $self} -> analyze();
+=del            
             if (!$command -> {type}) {
                 $status{ident $self} = 'P01';
             }
@@ -104,12 +107,13 @@ use Class::Std::Utils; {
             else {
                 $status{ident $self} = 'E03';
             }
+=cut
         }
         else {
-            $status{ident $self} = 'E02';
+            $status{ident $self} = 'Bad of command format';
         }
     }
-    
+=del
     sub status {
         my $self = shift;
         
@@ -121,10 +125,12 @@ use Class::Std::Utils; {
 
         return $STATUS{$status{ident $self}};
     }
-
+=cut
     sub response {
         my $self = shift;
 
+        return $resp{ident $self} -> get_result() unless $status{ident $self};
+=del
         if ($self -> status =~ /^P/) {
             return $resp{ident $self} -> get_static_response($self -> status_line);
         }
@@ -136,6 +142,7 @@ use Class::Std::Utils; {
         }
         else {
         }
+=cut
     }
 }
 
