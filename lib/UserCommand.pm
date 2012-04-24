@@ -7,7 +7,6 @@ use version;
 our $VERSION = qv('0.0.1');
 
 use General;
-use User;
 use Response;
 
 my %STATUS = (
@@ -19,8 +18,11 @@ my %STATUS = (
     P02 => 'HELPLIST',
     P03 => 'IHELPLIST',
     P04 => 'USERLIST',
-    S01 => 'ACNT',
-    S02 => 'PSWD',
+    C01 => 'ACNT',
+    C02 => 'PSWD',
+    C03 => 'INFO',
+    S01 => 'SETACNT',
+    S02 => 'SETPSWD',
     S03 => 'SETINFO',
 );
 
@@ -35,19 +37,14 @@ my %SETINFOS = (
 
 use Class::Std::Utils; {
     my %status;
-    my %user;
-    my %command;
+    my %resp;
 
     sub new {
         my ($class, %args) = @_;
         my $self = bless anon_scalar(), $class;
         
-        $status{ident $self} = 0;
-        $user{ident $self} = User -> new();
-        $command{ident $self} = {
-            type => '',
-            content => '',
-        };
+        $status{ident $self} = 'E01';
+        $resp{ident $self} = Response -> new();
         
         $self -> command_analyze(cmd => $args{command}) if $args{command};
         
@@ -59,30 +56,29 @@ use Class::Std::Utils; {
         my %args = @_;
         
         if ($args{cmd} =~ /^(.*?):(.*?):(.*?):(.*?)$/) {
-            $user{ident $self} -> settings(account => $1, password => $2);
-            $command{ident $self} -> {type} = $3;
-            $command{ident $self} -> {content} = decode_base64($4);
+            $resp{ident $self} -> user(account => $1, password => decode_base64($2));
+            my $command = $resp{ident $self} -> command(type => $3, content => decode_base64($4));
             
-            if (!$command{ident $self} -> {type}) {
+            if (!$command -> {type}) {
                 $status{ident $self} = 'P01';
             }
-            elsif ($command{ident $self} -> {type} =~ /^HELP$/) {
-                if ($command{ident $self} -> {content} =~ /^\s*$/i) {
+            elsif ($command -> {type} =~ /^HELP$/) {
+                if ($command -> {content} =~ /^\s*$/i) {
                     $status{ident $self} = 'P00';
                 }
-                elsif ($command{ident $self} -> {content} =~ /^\s*h\s*$/i) {
+                elsif ($command -> {content} =~ /^\s*h\s*$/i) {
                     $status{ident $self} = 'P02';
                 }
-                elsif ($command{ident $self} -> {content} =~ /^\s*i\s*$/i) {
+                elsif ($command -> {content} =~ /^\s*i\s*$/i) {
                     $status{ident $self} = 'P03';
                 }
-                elsif ($command{ident $self} -> {content} =~ /^\s*(a|s)\s*$/i) {
-                    $status{ident $self} = $1 =~ /a/i ? 'S01' : 'S02';
+                elsif ($command -> {content} =~ /^\s*(a|s)\s*$/i) {
+                    $status{ident $self} = $1 =~ /a/i ? 'C01' : 'C02';
                 }
-                elsif ($command{ident $self} -> {content} =~ /^\s*i\s+(.*?)\s*$/i) {
+                elsif ($command -> {content} =~ /^\s*i\s+(.*?)\s*$/i) {
                     my $subcmd = $1;
                     if (exists $SETINFOS{$subcmd}) {
-                        $status{ident $self} = 'S03';
+                        $status{ident $self} = 'C03';
                     }
                     else {
                         $status{ident $self} = 'E03';
@@ -92,14 +88,18 @@ use Class::Std::Utils; {
                     $status{ident $self} = 'E03';
                 }
             }
-            elsif ($command{ident $self} -> {type} =~ /^ACNT$/) {
+            elsif ($command -> {type} =~ /^ACNT$/) {
                 $status{ident $self} = 'S01';
             }
-            elsif ($command{ident $self} -> {type} =~ /^PSWD$/) {
+            elsif ($command -> {type} =~ /^PSWD$/) {
                 $status{ident $self} = 'S02';
             }
-            elsif ($command{ident $self} -> {type} =~ /^(?:I\+)(.*)$/) {
-                $status{ident $self} = '';
+            elsif ($command -> {type} =~ /^(?:I\+)(.*)$/) {
+                my $subcmd = $1;
+                $subcmd = lc $1;
+                if (exists $SETINFOS{$subcmd}) {
+                    $status{ident $self} = 'S03';
+                }
             }
             else {
                 $status{ident $self} = 'E03';
@@ -125,11 +125,16 @@ use Class::Std::Utils; {
     sub response {
         my $self = shift;
 
-        my $rsps = Response -> new();
         if ($self -> status =~ /^P/) {
-            return 'HELP:'.$rsps -> get_static_response($self -> status_line);
+            return $resp{ident $self} -> get_static_response($self -> status_line);
+        }
+        elsif ($self -> status =~ /^C/) {
+            return $resp{ident $self} -> get_cmd_response($self -> status_line);
         }
         elsif ($self -> status =~ /^S/) {
+            return $resp{ident $self} -> get_set_response($self -> status_line);
+        }
+        else {
         }
     }
 }

@@ -24,11 +24,11 @@ use Class::Std::Utils; {
 
     sub settings {
         my $self = shift;
-        my %input = @_ ? @_ : ();
+        my %args = @_ ? @_ : ();
 
-        if (keys %input) {
-            $account{ident $self} = $input{account} if $input{account};
-            $password{ident $self} = $input{password} if $input{password};
+        if (keys %args) {
+            $account{ident $self} = $args{account} if $args{account};
+            $password{ident $self} = $args{password} if $args{password};
         }
 
         return {

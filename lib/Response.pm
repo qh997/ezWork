@@ -7,9 +7,13 @@ use version;
 our $VERSION = qv('0.0.1');
 
 use General;
+use User;
 use Words;
 
 my $PROMPT = '?> ';
+my %MOVEMENT = (
+    'NULL' => 'HELP',
+);
 
 use Class::Std::Utils; {
     my %user;
@@ -19,10 +23,7 @@ use Class::Std::Utils; {
         my $class = shift;
         my $self = bless anon_scalar(), $class;
 
-        $user{ident $self} = {
-            account => '',
-            password => '',
-        };
+        $user{ident $self} = undef;
         $command{ident $self} = {
             type => '',
             content => '',
@@ -31,20 +32,27 @@ use Class::Std::Utils; {
         return $self;
     }
 
-    sub set_user {
+    sub user {
         my $self = shift;
-        my %args = @_;
+        my %args = @_ ? @_ : ();
 
-        $user{ident $self} -> {account} = $args{account};
-        $user{ident $self} -> {password} = $args{password};
+        $user{ident $self} = User -> new();
+        return $user{ident $self} -> settings(%args);
     }
 
-    sub set_command {
+    sub command {
         my $self = shift;
         my %args = @_;
 
-        $command{ident $self} -> {type} = $args{type};
-        $command{ident $self} -> {content} = $args{content};
+        if (keys %args) {
+            $command{ident $self}{type} = $args{type} if $args{type};
+            $command{ident $self}{content} = $args{content} if $args{content};
+        }
+
+        return {
+            type => $command{ident $self}{type},
+            content => $command{ident $self}{content},
+        };
     }
 
     sub get_static_response {
@@ -52,18 +60,32 @@ use Class::Std::Utils; {
         my $static_words = shift;
 
         if ($static_words eq 'WELCOME') {
-            return _encode64(get_welcome().$PROMPT);
+            return _get_next()._encode64(get_welcome().$PROMPT);
         }
         elsif ($static_words eq 'NULL') {
-            return _encode64($PROMPT);
+            return _get_next()._encode64($PROMPT);
         }
         else {
-            return _encode64(get_word($static_words).$PROMPT);
+            return _get_next()._encode64(get_word($static_words).$PROMPT);
         }
     }
 
-    sub get_response {
+    sub get_cmd_response {
         my $self = shift;
+        my $rqst = shift;
+
+        
+    }
+
+    sub get_set_response {
+        my $self = shift;
+    }
+
+    sub _get_next {
+        my $self = shift;
+        my $current = @_ ? shift : 'NULL';
+
+        return $MOVEMENT{$current}.':';
     }
 
     sub _encode64 {
