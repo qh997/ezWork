@@ -2,6 +2,7 @@ package General;
 
 use warnings;
 use strict;
+use Time::Format;
 use version;
 our $VERSION = qv('0.0.1');
 
@@ -36,7 +37,7 @@ sub get_configs {
 sub debug {
     my $string = shift;
     
-    print $string."\n" if $DEBUG;
+    print $time{'yyyy/mm/dd hh:mm:ss'}.' - '.$string."\n" if $DEBUG;
 }
 
 return 1;
