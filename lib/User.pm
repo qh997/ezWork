@@ -30,11 +30,34 @@ use Class::Std::Utils; {
             $account{ident $self} = $args{account} if $args{account};
             $password{ident $self} = $args{password} if $args{password};
         }
-
-        return {
-            account => $account{ident $self},
-            password => $password{ident $self},
-        };
+    }
+    
+    sub account {
+        my $self = shift;
+        return $account{ident $self};
+    }
+    
+    sub password {
+        my $self = shift;
+        return $password{ident $self};
+    }
+    
+    sub need_for {
+        my $self = shift;
+        my $next = shift;
+        
+        if ($next eq 'ACNT') {
+            return 0;
+        }
+        elsif ($next eq 'PSWD') {
+            return 'NEED_ACCOUNT' unless $account{ident $self};
+            return 0;
+        }
+        elsif ($next eq 'INFO') {
+            return 'NEED_ACCOUNT' unless $account{ident $self};
+            return 'NEED_PASSWORD' unless $password{ident $self};
+            return 0;
+        }
     }
 }
 

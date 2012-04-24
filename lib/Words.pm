@@ -8,7 +8,11 @@ use version;
 our $VERSION = qv('0.0.1');
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(get_welcome get_word);
+our @EXPORT = qw(
+    get_welcome
+    get_word
+    get_word_nowarp
+);
 
 my $WELCOME = <<END;
 \t***************************
@@ -22,7 +26,7 @@ Use 'h' for help list.
 END
 
 our $HELPLIST = <<END;
-    (a) Login creat or change account
+    (a) Login or creat or change account
     (s) Input or change password
     (i) Information edition command
     (p) Print your informations
@@ -38,6 +42,22 @@ our $IHELPLIST = <<END;
     (i sact) Set sub activity type
     (i prom) Set project module
     (i list) List all fields
+END
+
+our $INV_CMD = <<END;
+Invalid command, use 'h' for help.
+END
+
+our $ACNT = <<END;
+Input your email account
+END
+
+our $NEED_ACCOUNT = <<END;
+Use 'a' to login frist.
+END
+
+our $NEED_PASSWORD = <<END;
+Use 's' to register your account.
 END
 
 sub get_welcome {
@@ -59,6 +79,13 @@ sub get_welcome {
 no strict 'refs';
 sub get_word {
     return ${shift;};
+}
+
+sub get_word_nowarp {
+    my $str = ${shift;};
+    chomp $str;
+    
+    return $str;
 }
 
 return 1;

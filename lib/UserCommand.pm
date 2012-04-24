@@ -25,15 +25,6 @@ my %STATUS = (
     S02 => 'SETPSWD',
     S03 => 'SETINFO',
 );
-
-my %SETINFOS = (
-    'task' => 'txtTask',
-    'proj' => 'selProject',
-    'proj' => 'selProTask',
-    'actv' => 'selActType1',
-    'sact' => 'selActType2',
-    'prom' => 'selModule1',
-);
 =cut
 use Class::Std::Utils; {
     my %user;
