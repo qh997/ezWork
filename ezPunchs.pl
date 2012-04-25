@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use warnings;
 use strict;
+use MIME::Base64;
 
 my $SPECUSER = @ARGV ? shift : '';
 my $USERFILE = '/home/gengs/develops/ezWork/accountpunchs';
@@ -22,7 +23,7 @@ close $UF;
 foreach my $user (@userlist) {
     if ($user =~ /^(.*?):(.*?):(.*)$/) {
         my $user_name = $1;
-        my $user_pass = $2;
+        my $user_pass = decode_base64($2);
         my @user_time = split ';', $3;
 
         next if ($SPECUSER && ($SPECUSER ne $user_name));
@@ -31,13 +32,13 @@ foreach my $user (@userlist) {
         foreach my $date_def (@user_time) {
             if (!$activity && $date_def =~ /^(\d+)-(\d+)$/) {
                 my ($lower, $upper) = ($1, $2);
-                $activity = $lower =~ /^\d$/ ? $lower <= $NOW_WEEK && $NOW_WEEK <= $upper
-                                             : $lower <= $NOW_DATE && $NOW_DATE <= $upper;
+                $activity = $lower =~ /^\d$/ ? $lower <= $NOW_WEEK || $NOW_WEEK <= $upper
+                                             : $lower <= $NOW_DATE || $NOW_DATE <= $upper;
             }
             elsif ($activity && $date_def =~ /^-(\d+)-(\d+)$/) {
                 my ($lower, $upper) = ($1, $2);
-                $activity = $lower =~ /^\d$/ ? $lower >= $NOW_WEEK && $NOW_WEEK >= $upper
-                                             : $lower >= $NOW_DATE && $NOW_DATE >= $upper;
+                $activity = $lower =~ /^\d$/ ? $lower > $NOW_WEEK || $NOW_WEEK > $upper
+                                             : $lower > $NOW_DATE || $NOW_DATE > $upper;
             }
             elsif (!$activity && $date_def =~ /^(\d+)$/) {
                 my $date = $1;
