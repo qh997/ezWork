@@ -42,7 +42,7 @@ our $IHELPLIST = <<END;
     (i prot) Set project task
     (i actv) Set activity type
     (i sact) Set sub activity type
-    (i prom) Set project module
+    (i mode) Set project module
     (i list) List all fields
 END
 

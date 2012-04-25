@@ -11,7 +11,7 @@ use General;
 use Class::Std::Utils; {
     my %account;
     my %password;
-    my %status;
+    my %lack;
 
     sub new {
         my $class = shift;
@@ -19,32 +19,46 @@ use Class::Std::Utils; {
 
         $account{ident $self} = '';
         $password{ident $self} = '';
-        $status{ident $self} = 'NEED_ACCOUNT';
+        $lack{ident $self} = 'NEED_ACCOUNT';
         
         return $self;
     }
 
-    sub settings {
-        my $self = shift;
-        my %args = @_ ? @_ : ();
-
-        if (keys %args) {
-            if ($args{account}) {
-                $account{ident $self} = $args{account};
-                $status{ident $self} = 'NEED_PASSWORD';
-            }
-
-            if ($args{password}) {
-                $password{ident $self} = $args{password};
-                $status{ident $self} = 0;
-            }
-        }
-    }
-
     sub account {
         my $self = shift;
+        my $input = @_ ? shift : undef;
+        
+        if (defined $input) {
+            $account{ident $self} = $input;
+            $password{ident $self} = '';
+            $lack{ident $self} = 'NEED_PASSWORD';
+        }
 
         return $account{ident $self};
+    }
+
+    sub password {
+        my $self = shift;
+        my $input = @_ ? shift : undef;
+
+        if (defined $input) {
+            if ($account{ident $self}) {
+                if (check_password($account{ident $self}, $input)) {
+                    $password{ident $self} = $input;
+                    $lack{ident $self} = 0;
+                }
+                else {
+                    $password{ident $self} = '';
+                    $lack{ident $self} = 'NEED_PASSWORD';
+                }
+            }
+            else {
+                $password{ident $self} = '';
+                $lack{ident $self} = 'NEED_ACCOUNT';
+            }
+        }
+
+        return $password{ident $self};
     }
 
     sub login {
@@ -102,7 +116,7 @@ use Class::Std::Utils; {
         elsif ($next eq 'PSWD') {
             return 0 if $account{ident $self};
         }
-        return $status{ident $self};
+        return $lack{ident $self};
     }
 
     sub check_password {
@@ -124,10 +138,10 @@ use Class::Std::Utils; {
         }      
     }
 
-    sub status {
+    sub lack {
         my $self = shift;
 
-        return $status{ident $self};
+        return $lack{ident $self};
     }
 }
 

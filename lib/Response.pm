@@ -24,7 +24,7 @@ my %MOVEMENT = (
     'I+PROT' => 'HELP',
     'I+ACTV' => 'HELP',
     'I+SACT' => 'HELP',
-    'I+PROM' => 'HELP',
+    'I+MODE' => 'HELP',
 );
 my %SETINFOS = (
     'TASK' => 'txtTask',
@@ -32,7 +32,7 @@ my %SETINFOS = (
     'PROT' => 'selProTask',
     'ACTV' => 'selActType1',
     'SACT' => 'selActType2',
-    'PROM' => 'selModule1',
+    'MODE' => 'selModule1',
 );
 
 use Class::Std::Utils; {
@@ -62,7 +62,8 @@ use Class::Std::Utils; {
         my %args = @_ ? @_ : ();
 
         $user{ident $self} = User -> new();
-        return $user{ident $self} -> settings(%args);
+        $user{ident $self} -> account($args{account});
+        $user{ident $self} -> password($args{password});
     }
 
     sub command {
@@ -163,6 +164,9 @@ use Class::Std::Utils; {
                 else {
                     $result{ident $self}{content} = _encode64(get_word($word).$HPROMPT);
                 }
+            }
+            else {
+                
             }
         }
         else {
