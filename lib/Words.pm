@@ -91,6 +91,10 @@ our $NOTHING = <<END;
 Nothing to change.
 END
 
+our $TASK = <<END;
+Type the task text. (*EXISTS*)
+END
+
 sub get_welcome {
     my $hostname = `hostname`;
     chomp $hostname;

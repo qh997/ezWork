@@ -7,10 +7,12 @@ use version;
 our $VERSION = qv('0.0.1');
 
 use General;
+use UserInfo;
 
 use Class::Std::Utils; {
     my %account;
     my %password;
+    my %info;
     my %lack;
 
     sub new {
@@ -19,6 +21,7 @@ use Class::Std::Utils; {
 
         $account{ident $self} = '';
         $password{ident $self} = '';
+        $info{ident $self} = UserInfo -> new();
         $lack{ident $self} = 'NEED_ACCOUNT';
         
         return $self;
@@ -31,6 +34,7 @@ use Class::Std::Utils; {
         if (defined $input) {
             $account{ident $self} = $input;
             $password{ident $self} = '';
+            $info{ident $self} -> user();
             $lack{ident $self} = 'NEED_PASSWORD';
         }
 
@@ -42,18 +46,14 @@ use Class::Std::Utils; {
         my $input = @_ ? shift : undef;
 
         if (defined $input) {
-            if ($account{ident $self}) {
-                if (check_password($account{ident $self}, $input)) {
-                    $password{ident $self} = $input;
-                    $lack{ident $self} = 0;
-                }
-                else {
-                    $password{ident $self} = '';
-                    $lack{ident $self} = 'NEED_PASSWORD';
-                }
+            if ($account{ident $self} && CheckPassword($account{ident $self}, $input)) {
+                $password{ident $self} = $input;
+                $info{ident $self} -> user($account{ident $self});
+                $lack{ident $self} = 0;
             }
             else {
                 $password{ident $self} = '';
+                $info{ident $self} -> user();
                 $lack{ident $self} = 'NEED_ACCOUNT';
             }
         }
@@ -61,7 +61,7 @@ use Class::Std::Utils; {
         return $password{ident $self};
     }
 
-    sub login {
+    sub Login {
         my $account = shift;
         chomp $account;
 
@@ -97,7 +97,7 @@ use Class::Std::Utils; {
             return (0, 'NOTHING');
         }
         else {
-            if (check_password($account{ident $self}, $password)) {
+            if (CheckPassword($account{ident $self}, $password)) {
                 return (1, 'REGISTER');
             }
             else {
@@ -118,8 +118,20 @@ use Class::Std::Utils; {
         }
         return $lack{ident $self};
     }
+    
+    sub field {
+        my $self = shift;
+        my $field = shift;
+        my $value = @_ ? shift : undef;
+        
+        if (defined $value) {
+            
+        }
+        
+        
+    }
 
-    sub check_password {
+    sub CheckPassword {
         my $account = shift;
         my $password = shift;
 
