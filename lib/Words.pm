@@ -12,6 +12,8 @@ our @EXPORT = qw(
     get_welcome
     get_word
     get_word_nowarp
+    get_word_replace
+    get_word_replace_nowarp
 );
 
 my $WELCOME = <<END;
@@ -52,6 +54,10 @@ our $ACNT = <<END;
 Input your email account
 END
 
+our $PSWD = <<END;
+Input your email password
+END
+
 our $NEED_ACCOUNT = <<END;
 Use 'a' to login frist.
 END
@@ -65,12 +71,24 @@ Login as *ACCOUNT*.
 END
 
 our $CREAT_ACCOUNT = <<END;
-Creat account ACCOUNT, password [neusoft].
+Creat account *ACCOUNT*, password [neusoft].
 END
 
 our $BAD_ACCOUNT = <<END;
-Bad of user name.
-User name CANNOT contain special characters, such as @/: etc.
+* Bad of user name.
+* User name CANNOT contain special characters or space.
+END
+
+our $REGISTER = <<END;
+Register as *ACCOUNT*.
+END
+
+our $BAD_REGISTER = <<END;
+Invalid password.
+END
+
+our $NOTHING = <<END;
+Nothing to change.
 END
 
 sub get_welcome {

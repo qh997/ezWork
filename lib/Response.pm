@@ -142,8 +142,27 @@ use Class::Std::Utils; {
         my $self = shift;
 
         my $scmd = $command{ident $self}{type};
+        my $mesg = $command{ident $self}{content};
         if (my $next = _get_next(uc $scmd)) {
             if ($scmd eq 'ACNT') {
+                my ($login, $word) = User::login($mesg);
+                if ($login) {
+                    $result{ident $self}{command} = $next;
+                    $result{ident $self}{content} = _encode64(get_word_replace($word, 'ACCOUNT' => $mesg).$HPROMPT);
+                }
+                else {
+                    $result{ident $self}{content} = _encode64(get_word($word).$HPROMPT);
+                }
+            }
+            elsif ($scmd eq 'PSWD') {
+                my ($login, $word) = $user{ident $self} -> register($mesg);
+                if ($login) {
+                    $result{ident $self}{command} = $next;
+                    $result{ident $self}{content} = _encode64(get_word_replace($word, 'ACCOUNT' => $user{ident $self} -> account).$HPROMPT);
+                }
+                else {
+                    $result{ident $self}{content} = _encode64(get_word($word).$HPROMPT);
+                }
             }
         }
         else {

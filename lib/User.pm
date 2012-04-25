@@ -41,21 +41,55 @@ use Class::Std::Utils; {
         }
     }
 
-    sub login {
+    sub account {
         my $self = shift;
+
+        return $account{ident $self};
+    }
+
+    sub login {
         my $account = shift;
         chomp $account;
 
-        if ($account =~ /[@#:!$%^&*();'"`~\/\\]/) {
-            return 'BAD_ACCOUNT';
+        if ($account =~ /[@#:!$%^&*();'"`~\/\\ ]/) {
+            return (0, 'BAD_ACCOUNT');
+        }
+        elsif (!$account) {
+            return (0, 'NOTHING');
         }
         else {
-            return '';
+            my %CFGS = get_configs();
+
+            open my $UF, '< '.$CFGS{USERLIST};
+            my @user_list = <$UF>;
+            close $UF;
+
+            if (grep(/^$account/, @user_list)) {
+                return (1, 'LOGIN_ACCOUNT');
+            }
+            else {
+                `echo "$account:bmV1c29mdA==:" >> $CFGS{USERLIST}`;
+                return (1, 'CREAT_ACCOUNT');
+            }
         }
     }
 
-    sub password {
+    sub register {
         my $self = shift;
+        my $password = shift;
+        chomp $password;
+
+        if (!$password) {
+            return (0, 'NOTHING');
+        }
+        else {
+            if (check_password($account{ident $self}, $password)) {
+                return (1, 'REGISTER');
+            }
+            else {
+                return (0, 'BAD_REGISTER');
+            }
+        }
     }
 
     sub need_for {
@@ -65,9 +99,35 @@ use Class::Std::Utils; {
         if ($next eq 'ACNT') {
             return 0;
         }
-        else {
-            return $status{ident $self};
+        elsif ($next eq 'PSWD') {
+            return 0 if $account{ident $self};
         }
+        return $status{ident $self};
+    }
+
+    sub check_password {
+        my $account = shift;
+        my $password = shift;
+
+        $password = encode_base64($password, '');
+        my %CFGS = get_configs();
+
+        open my $UF, '< '.$CFGS{USERLIST};
+        my @user_list = <$UF>;
+        close $UF;
+
+        if (grep(/^$account:$password:/, @user_list)) {
+            return 1;
+        }
+        else {
+            return 0;
+        }      
+    }
+
+    sub status {
+        my $self = shift;
+
+        return $status{ident $self};
     }
 }
 
