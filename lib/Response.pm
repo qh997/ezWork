@@ -17,6 +17,14 @@ my %MOVEMENT = (
     'A' => 'ACNT',
     'S' => 'PSWD',
     'P' => 'HELP',
+    'ACNT' => 'ACOK',
+    'PSWD' => 'PWOK',
+    'I+TASK' => 'HELP',
+    'I+PROJ' => 'HELP',
+    'I+PROT' => 'HELP',
+    'I+ACTV' => 'HELP',
+    'I+SACT' => 'HELP',
+    'I+PROM' => 'HELP',
 );
 my %SETINFOS = (
     'TASK' => 'txtTask',
@@ -42,7 +50,7 @@ use Class::Std::Utils; {
             content => '',
         };
         $result{ident $self} = {
-            command => '',
+            command => _get_next(),
             content => '',
         };
         
@@ -73,7 +81,6 @@ use Class::Std::Utils; {
     sub analyze {
         my $self = shift;
 
-        $result{ident $self}{command} = _get_next();
         if ($command{ident $self}{type} eq '') {
             $result{ident $self}{content} = _encode64(get_welcome().$HPROMPT);
         }
@@ -88,8 +95,11 @@ use Class::Std::Utils; {
                 $result{ident $self}{content} = _encode64(get_word('IHELPLIST').$HPROMPT);
             }
             else {
-                $result{ident $self}{content} = $self -> get_cmd_response();
+                $self -> get_cmd_response();
             }
+        }
+        else {
+            $self -> get_set_response();
         }
     }
     
@@ -99,13 +109,12 @@ use Class::Std::Utils; {
         my $ucmd = $command{ident $self}{content};
         if ($ucmd =~ /^i\s+(.*)$/i) {
             my $next = uc $1;
-            debug $next;
             if (defined $SETINFOS{$next}) {
                 if (my $need = $user{ident $self} -> need_for($next)) {
                     $result{ident $self}{content} = _encode64(get_word($need).$HPROMPT);
                 }
                 else {
-                    $result{ident $self}{command} = $next;
+                    $result{ident $self}{command} = 'I+'.$next;
                     $result{ident $self}{content} = _encode64(get_word_nowarp($next).$SPROMPT);
                 }
             }
@@ -129,6 +138,26 @@ use Class::Std::Utils; {
         }
     }
 
+    sub get_set_response {
+        my $self = shift;
+
+        my $scmd = $command{ident $self}{type};
+        if (my $next = _get_next(uc $scmd)) {
+            if ($scmd eq 'ACNT') {
+            }
+        }
+        else {
+            $result{ident $self}{content} = _encode64(get_word('INV_CMD').$HPROMPT);
+        }
+    }
+
+    sub set_warning {
+        my $self = shift;
+
+        $result{ident $self}{command} = _get_next();
+        $result{ident $self}{content} = _encode64($_[0].$HPROMPT);
+    }
+
     sub get_result {
         my $self = shift;
 
@@ -148,17 +177,6 @@ use Class::Std::Utils; {
         else {
             return _get_next()._encode64(get_word($static_words).$PROMPT);
         }
-    }
-
-    sub get_cmd_response {
-        my $self = shift;
-        my $rqst = shift;
-
-        
-    }
-
-    sub get_set_response {
-        my $self = shift;
     }
 =cut
 

@@ -101,7 +101,7 @@ use Class::Std::Utils; {
 =cut
         }
         else {
-            $status{ident $self} = 'Bad of command format';
+            $resp{ident $self} -> set_warning("Bad of command format.\n");
         }
     }
 =del
@@ -120,7 +120,7 @@ use Class::Std::Utils; {
     sub response {
         my $self = shift;
 
-        return $resp{ident $self} -> get_result() unless $status{ident $self};
+        return $resp{ident $self} -> get_result();
 =del
         if ($self -> status =~ /^P/) {
             return $resp{ident $self} -> get_static_response($self -> status_line);

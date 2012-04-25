@@ -60,6 +60,19 @@ our $NEED_PASSWORD = <<END;
 Use 's' to register your account.
 END
 
+our $LOGIN_ACCOUNT = <<END;
+Login as *ACCOUNT*.
+END
+
+our $CREAT_ACCOUNT = <<END;
+Creat account ACCOUNT, password [neusoft].
+END
+
+our $BAD_ACCOUNT = <<END;
+Bad of user name.
+User name CANNOT contain special characters, such as @/: etc.
+END
+
 sub get_welcome {
     my $hostname = `hostname`;
     chomp $hostname;
@@ -82,9 +95,27 @@ sub get_word {
 }
 
 sub get_word_nowarp {
-    my $str = ${shift;};
+    my $str = get_word(@_);
     chomp $str;
-    
+
+    return $str;
+}
+
+sub get_word_replace {
+    my $str = ${shift;};
+    my %replace = @_;
+
+    while (my ($ori, $tar) = each %replace) {
+        $str =~ s/\*$ori\*/$tar/g;
+    }
+
+    return $str;
+}
+
+sub get_word_replace_nowarp {
+    my $str = get_word_replace(@_);
+    chomp $str;
+
     return $str;
 }
 

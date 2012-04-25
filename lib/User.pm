@@ -11,6 +11,7 @@ use General;
 use Class::Std::Utils; {
     my %account;
     my %password;
+    my %status;
 
     sub new {
         my $class = shift;
@@ -18,6 +19,7 @@ use Class::Std::Utils; {
 
         $account{ident $self} = '';
         $password{ident $self} = '';
+        $status{ident $self} = 'NEED_ACCOUNT';
         
         return $self;
     }
@@ -27,21 +29,35 @@ use Class::Std::Utils; {
         my %args = @_ ? @_ : ();
 
         if (keys %args) {
-            $account{ident $self} = $args{account} if $args{account};
-            $password{ident $self} = $args{password} if $args{password};
+            if ($args{account}) {
+                $account{ident $self} = $args{account};
+                $status{ident $self} = 'NEED_PASSWORD';
+            }
+
+            if ($args{password}) {
+                $password{ident $self} = $args{password};
+                $status{ident $self} = 0;
+            }
         }
     }
-    
-    sub account {
+
+    sub login {
         my $self = shift;
-        return $account{ident $self};
+        my $account = shift;
+        chomp $account;
+
+        if ($account =~ /[@#:!$%^&*();'"`~\/\\]/) {
+            return 'BAD_ACCOUNT';
+        }
+        else {
+            return '';
+        }
     }
-    
+
     sub password {
         my $self = shift;
-        return $password{ident $self};
     }
-    
+
     sub need_for {
         my $self = shift;
         my $next = shift;
@@ -49,14 +65,8 @@ use Class::Std::Utils; {
         if ($next eq 'ACNT') {
             return 0;
         }
-        elsif ($next eq 'PSWD') {
-            return 'NEED_ACCOUNT' unless $account{ident $self};
-            return 0;
-        }
-        elsif ($next eq 'INFO') {
-            return 'NEED_ACCOUNT' unless $account{ident $self};
-            return 'NEED_PASSWORD' unless $password{ident $self};
-            return 0;
+        else {
+            return $status{ident $self};
         }
     }
 }

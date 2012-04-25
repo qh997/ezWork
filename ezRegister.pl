@@ -28,6 +28,8 @@ while (my $new_socket = $main_socket -> accept()) {
     }
 }
 
+close $main_socket;
+
 sub start {
     my $socket = shift;
 
