@@ -8,6 +8,8 @@ my %USER = (
     NAME => @ARGV ? shift : 'gengs',
     PSWD => @ARGV ? shift : '',
 );
+chomp $USER{NAME};
+chomp $USER{PSWD};
 
 my %URLS = (
     INDX => 'http://kq.neusoft.com/index.jsp',
@@ -45,7 +47,7 @@ my $logn_para = 'login=true';
 $logn_para .= '&neusoft_attendance_online=';
 $logn_para .= '&KEY'.$neusoft_key.'=';
 $logn_para .= '&neusoft_key=ID'.$neusoft_key.'PWD'.$neusoft_key;
-$logn_para .= '&'.$name_id.'='.$USER{NAME};
+$logn_para .= '&'.$name_id.'='.URL::Encode::url_encode($USER{NAME});
 $logn_para .= '&'.$pass_id.'='.URL::Encode::url_encode($USER{PSWD});
 
 $response = $browser -> post("$URLS{LOGN}?$logn_para", @HEAD);

@@ -58,6 +58,7 @@ foreach my $user (@userlist) {
             my $pid = fork();
             if (defined $pid && $pid == 0) {
                 print "$user_name sleep $run_time\n";
+                sleep $run_time;
                 my $fail = 5;
                 while ($fail) {
                     system("/home/gengs/develops/ezWork/ezPunch.pl '$user_name' '$user_pass'") ? ($fail--) : ($fail = 0);
