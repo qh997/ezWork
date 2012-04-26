@@ -76,17 +76,17 @@ use Class::Std::Utils; {
         my $self = shift;
 
         if ($command{ident $self}{type} eq '') {
-            $result{ident $self}{content} = _encode64(get_welcome().$HPROMPT);
+            $result{ident $self}{content} = get_welcome().$HPROMPT;
         }
         elsif ($command{ident $self}{type} eq 'HELP') {
             if (!$command{ident $self}{content}) {
-                $result{ident $self}{content} = _encode64($HPROMPT);
+                $result{ident $self}{content} = $HPROMPT;
             }
             elsif ($command{ident $self}{content} =~ /^h$/i) {
-                $result{ident $self}{content} = _encode64(get_word('HELPLIST').$HPROMPT);
+                $result{ident $self}{content} = get_word('HELPLIST').$HPROMPT;
             }
             elsif ($command{ident $self}{content} =~ /^i$/i) {
-                $result{ident $self}{content} = _encode64(get_word('IHELPLIST').$HPROMPT);
+                $result{ident $self}{content} = get_word('IHELPLIST').$HPROMPT;
             }
             else {
                 $self -> get_cmd_response();
@@ -105,7 +105,7 @@ use Class::Std::Utils; {
             my $next = uc $1;
             if (UserInfo::SettingExists($next)) {
                 if (my $need = $user{ident $self} -> need_for($next)) {
-                    $result{ident $self}{content} = _encode64(get_word($need).$HPROMPT);
+                    $result{ident $self}{content} = get_word($need).$HPROMPT;
                 }
                 else {
                     my $evalue = $user{ident $self} -> field_value($next);
@@ -115,27 +115,27 @@ use Class::Std::Utils; {
                     if ($ftype eq 'TXT') {
                     }
                     elsif ($ftype eq 'SEL') {
-                        $result{ident $self}{content} = _encode64(get_word_nowarp('SEL_ATON'));
+                        $result{ident $self}{content} = get_word('SEL_ATON');
                     }
-                    $result{ident $self}{content} .= _encode64(get_word_replace_nowarp($next, 'EXISTS' => $evalue).$SPROMPT);
+                    $result{ident $self}{content} .= get_word_replace_nowarp($next, 'EXISTS' => $evalue).$SPROMPT;
                 }
             }
             else {
-                $result{ident $self}{content} = _encode64(get_word('INV_CMD').$HPROMPT);
+                $result{ident $self}{content} = get_word('INV_CMD').$HPROMPT;
             }
         }
         else {
             if (my $next = _get_next(uc $ucmd)) {
                 if (my $need = $user{ident $self} -> need_for($next)) {
-                    $result{ident $self}{content} = _encode64(get_word($need).$HPROMPT);
+                    $result{ident $self}{content} = get_word($need).$HPROMPT;
                 }
                 else {
                     $result{ident $self}{command} = $next;
-                    $result{ident $self}{content} = _encode64(get_word_nowarp($next).$SPROMPT);
+                    $result{ident $self}{content} = get_word_nowarp($next).$SPROMPT;
                 }
             }
             else {
-                $result{ident $self}{content} = _encode64(get_word('INV_CMD').$HPROMPT);
+                $result{ident $self}{content} = get_word('INV_CMD').$HPROMPT;
             }
         }
     }
@@ -150,29 +150,27 @@ use Class::Std::Utils; {
                 my ($login, $word) = User::Login($mesg);
                 if ($login) {
                     $result{ident $self}{command} = $next;
-                    $result{ident $self}{content} = _encode64(
-                        get_word_replace($word, 'ACCOUNT' => $mesg).$HPROMPT
-                    );
+                    $result{ident $self}{content} = get_word_replace($word, 'ACCOUNT' => $mesg).$HPROMPT;
                 }
                 else {
-                    $result{ident $self}{content} = _encode64(get_word($word).$HPROMPT);
+                    $result{ident $self}{content} = get_word($word).$HPROMPT;
                 }
             }
             elsif ($scmd eq 'PSWD') {
                 my ($login, $word) = $user{ident $self} -> register($mesg);
                 if ($login) {
                     $result{ident $self}{command} = $next;
-                    $result{ident $self}{content} = _encode64(get_word_replace($word, 'ACCOUNT' => $user{ident $self} -> account).$HPROMPT);
+                    $result{ident $self}{content} = get_word_replace($word, 'ACCOUNT' => $user{ident $self} -> account).$HPROMPT;
                 }
                 else {
-                    $result{ident $self}{content} = _encode64(get_word($word).$HPROMPT);
+                    $result{ident $self}{content} = get_word($word).$HPROMPT;
                 }
             }
             else {
             }
         }
         else {
-            $result{ident $self}{content} = _encode64(get_word('UKN_CMD').$HPROMPT);
+            $result{ident $self}{content} = get_word('UKN_CMD').$HPROMPT;
         }
     }
 
@@ -180,13 +178,13 @@ use Class::Std::Utils; {
         my $self = shift;
 
         $result{ident $self}{command} = _get_next();
-        $result{ident $self}{content} = _encode64($_[0].$HPROMPT);
+        $result{ident $self}{content} = $_[0].$HPROMPT;
     }
 
     sub get_result {
         my $self = shift;
 
-        return $result{ident $self}{command}.':'.$result{ident $self}{content};
+        return $result{ident $self}{command}.':'._encode64($result{ident $self}{content});
     }
 
     sub _get_next {
