@@ -50,6 +50,10 @@ our $INV_CMD = <<END;
 Invalid command, use 'h' for help.
 END
 
+our $UKN_CMD = <<END;
+Unkonw system status.
+END
+
 our $ACNT = <<END;
 Input your email account
 END
@@ -93,6 +97,19 @@ END
 
 our $TASK = <<END;
 Type the task text. (*EXISTS*)
+END
+
+our $PROJ = <<END;
+Type the project number. (*EXISTS*)
+END
+
+our $SEL_ATON = <<END;
+****************************************************************************
+*                            !!PAY ATTENTION!!                             *
+* You SHOULD ONLY use the following values in the parentheses.             *
+* If the list is NULL, you can just press {enter} to set this field empty. *
+****************************************************************************
+
 END
 
 sub get_welcome {

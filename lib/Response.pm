@@ -20,12 +20,12 @@ my %MOVEMENT = (
     'P' => 'HELP',
     'ACNT' => 'ACOK',
     'PSWD' => 'PWOK',
-    'I_TASK' => 'HELP',
-    'I_PROJ' => 'HELP',
-    'I_PROT' => 'HELP',
-    'I_ACTV' => 'HELP',
-    'I_SACT' => 'HELP',
-    'I_MODE' => 'HELP',
+    'TASK' => 'HELP',
+    'PROJ' => 'HELP',
+    'PROT' => 'HELP',
+    'ACTV' => 'HELP',
+    'SACT' => 'HELP',
+    'MODE' => 'HELP',
 );
 
 use Class::Std::Utils; {
@@ -108,13 +108,16 @@ use Class::Std::Utils; {
                     $result{ident $self}{content} = _encode64(get_word($need).$HPROMPT);
                 }
                 else {
+                    my $evalue = $user{ident $self} -> field_value($next);
+                    my $ftype = UserInfo::FieldType($next);
+
                     $result{ident $self}{command} = 'I+'.$next;
-                    $result{ident $self}{content} = _encode64(
-                        get_word_replace_nowarp(
-                            $next,
-                            'EXISTS' => $user{ident $self} -> field($next)
-                        ).$SPROMPT
-                    );
+                    if ($ftype eq 'TXT') {
+                    }
+                    elsif ($ftype eq 'SEL') {
+                        $result{ident $self}{content} = _encode64(get_word_nowarp('SEL_ATON'));
+                    }
+                    $result{ident $self}{content} .= _encode64(get_word_replace_nowarp($next, 'EXISTS' => $evalue).$SPROMPT);
                 }
             }
             else {
@@ -142,7 +145,7 @@ use Class::Std::Utils; {
 
         my $scmd = $command{ident $self}{type};
         my $mesg = $command{ident $self}{content};
-        if (my $next = _get_next(uc $scmd)) {
+        if (my $next = _get_next($scmd)) {
             if ($scmd eq 'ACNT') {
                 my ($login, $word) = User::Login($mesg);
                 if ($login) {
@@ -159,22 +162,17 @@ use Class::Std::Utils; {
                 my ($login, $word) = $user{ident $self} -> register($mesg);
                 if ($login) {
                     $result{ident $self}{command} = $next;
-                    $result{ident $self}{content} = _encode64(
-                        get_word_replace(
-                            $word, 'ACCOUNT' => $user{ident $self} -> account
-                        ).$HPROMPT
-                    );
+                    $result{ident $self}{content} = _encode64(get_word_replace($word, 'ACCOUNT' => $user{ident $self} -> account).$HPROMPT);
                 }
                 else {
                     $result{ident $self}{content} = _encode64(get_word($word).$HPROMPT);
                 }
             }
             else {
-                
             }
         }
         else {
-            $result{ident $self}{content} = _encode64(get_word('INV_CMD').$HPROMPT);
+            $result{ident $self}{content} = _encode64(get_word('UKN_CMD').$HPROMPT);
         }
     }
 
@@ -193,6 +191,12 @@ use Class::Std::Utils; {
 
     sub _get_next {
         my $current = @_ ? shift : 'NULL';
+        $current = uc $current;
+
+        if ($current =~ /^I\+(.*)$/) {
+            $current = $1;
+            return _get_next() if defined $MOVEMENT{$current};
+        }
 
         return $MOVEMENT{$current} if defined $MOVEMENT{$current};
         return 0;

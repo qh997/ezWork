@@ -34,7 +34,7 @@ use Class::Std::Utils; {
         if (defined $input) {
             $account{ident $self} = $input;
             $password{ident $self} = '';
-            $info{ident $self} -> user();
+            $info{ident $self} -> user('');
             $lack{ident $self} = 'NEED_PASSWORD';
         }
 
@@ -53,7 +53,7 @@ use Class::Std::Utils; {
             }
             else {
                 $password{ident $self} = '';
-                $info{ident $self} -> user();
+                $info{ident $self} -> user('');
                 $lack{ident $self} = 'NEED_ACCOUNT';
             }
         }
@@ -119,16 +119,16 @@ use Class::Std::Utils; {
         return $lack{ident $self};
     }
     
-    sub field {
+    sub field_option {
+        my $self = shift;
+    }
+    
+    sub field_value {
         my $self = shift;
         my $field = shift;
         my $value = @_ ? shift : undef;
-        
-        if (defined $value) {
-            
-        }
-        
-        
+
+        return $info{ident $self} -> field_value($field, $value);
     }
 
     sub CheckPassword {
