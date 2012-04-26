@@ -97,11 +97,26 @@ use Class::Std::Utils; {
             return (0, 'NOTHING');
         }
         else {
-            if (CheckPassword($account{ident $self}, $password)) {
-                return (1, 'REGISTER');
+            if ($lack{ident $self}) {
+                if (CheckPassword($account{ident $self}, $password)) {
+                    return (1, 'REGISTER');
+                }
+                else {
+                    return (0, 'BAD_REGISTER');
+                }
             }
             else {
-                return (0, 'BAD_REGISTER');
+                if (CheckPassword($account{ident $self}, $password{ident $self})) {
+                    if ($self -> _change_password($password)) {
+                        return (1, 'PASSWORD_CHANGED');
+                    }
+                    else {
+                        return (0, 'NOT_VER_PASSWORD');
+                    }
+                }
+                else {
+                    return (0, 'BAD_REGISTER');
+                }
             }
         }
     }
@@ -170,6 +185,38 @@ use Class::Std::Utils; {
         my $self = shift;
 
         return $lack{ident $self};
+    }
+
+    sub _change_password {
+        my $self = shift;
+        my $pswd = shift;
+
+        my $acnt = $account{ident $self};
+
+        my $chk_pass_ol = `perl getuseroptions.pl '$acnt' '$pswd'`;
+
+        if ($chk_pass_ol =~ /!ERROR! Invalid username or password!!/) {
+            return 0;
+        }
+        else {
+            my %CFGS = get_configs();
+
+            open my $UF, '< '.$CFGS{USERLIST};
+            my @user_list = <$UF>;
+            close $UF;
+
+            my $epswd = encode_base64($pswd, '');
+            foreach my $line (@user_list) {
+                if ($line =~ /^$acnt:/) {
+                    $line =~ s/^($acnt:)[^:]*/$1$epswd/;
+                }
+            }
+
+            open my $OH, '> '.$CFGS{USERLIST};
+            print $OH join '', @user_list;
+            close $OH;
+            return 1;
+        }
     }
 }
 

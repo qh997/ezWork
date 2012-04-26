@@ -91,6 +91,22 @@ our $BAD_REGISTER = <<END;
 Invalid password.
 END
 
+our $PASSWORD_CHANGED = <<END;
+Your password has been successfully set.
+Your option has been successfully update.
+END
+
+our $NOT_VER_PASSWORD = <<END;
+*************************************
+*            !!WARNING!!            *
+* Your password CANNOT be verified. *
+* Please confirm your input or try  *
+* it later.                         *
+* And there is nothing to change.   *
+*************************************
+
+END
+
 our $NOTHING = <<END;
 Nothing to change.
 END

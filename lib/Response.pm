@@ -117,6 +117,7 @@ use Class::Std::Utils; {
                     elsif ($ftype eq 'SEL') {
                         $result{ident $self}{content} = get_word('SEL_ATON');
                     }
+
                     $result{ident $self}{content} .= get_word_replace_nowarp($next, 'EXISTS' => $evalue).$SPROMPT;
                 }
             }
