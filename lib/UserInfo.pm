@@ -17,6 +17,13 @@ my %FIELDS = (
     'MODE' => ['SEL' => 'selModule1'],
 );
 
+my %DEPEND = (
+    'PROT' => 'PROJ',
+    'ACTV' => 'PROJ',
+    'SACT' => 'ACTV',
+    'MODE' => 'PROJ',
+);
+
 use Class::Std::Utils; {
     my %user;
     my %info;
@@ -24,7 +31,7 @@ use Class::Std::Utils; {
     sub new {
         my $class = shift;
         my $self = bless anon_scalar(), $class;
-        
+
         $user{ident $self} = '';
         $info{ident $self} = {};
         
@@ -44,6 +51,21 @@ use Class::Std::Utils; {
         }
 
         return $user{ident $self};
+    }
+
+    sub depend_on {
+        my $self = shift;
+        my $field = shift;
+
+        my $depval = 0;
+        if (exists $DEPEND{$field}) {
+            $depval = $self -> depend_on($DEPEND{$field});
+            if (!$depval && !$self -> field_value($DEPEND{$field})) {
+                $depval = 'NEED_'.$DEPEND{$field};
+            }
+        }
+
+        return $depval;
     }
 
     sub field_value {
@@ -95,7 +117,7 @@ use Class::Std::Utils; {
                 $info{ident $self}{$fdef} = decode_base64($1);
             }
             else {
-                $info{ident $self}{$fdef} = '';
+                $info{ident $self}{$fdef} = undef;
             }
         }
 

@@ -103,12 +103,20 @@ our $PROJ = <<END;
 Type the project number. (*EXISTS*)
 END
 
+our $NEED_PROJ = <<END;
+You should use 'i proj' to set project frist.
+END
+
 our $PROT = <<END;
 Type the project task type number. (*EXISTS*)
 END
 
 our $ACTV = <<END;
 Type the active type number. (*EXISTS*)
+END
+
+our $NEED_ACTV = <<END;
+You should use 'i actv' to set active type frist.
 END
 
 our $SACT = <<END;

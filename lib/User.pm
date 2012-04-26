@@ -116,7 +116,18 @@ use Class::Std::Utils; {
         elsif ($next eq 'PSWD') {
             return 0 if $account{ident $self};
         }
+        else {
+            return $info{ident $self} -> depend_on($next);
+        }
+
         return $lack{ident $self};
+    }
+
+    sub depend_for {
+        my $self = shift;
+        my $next = shift;
+        
+        
     }
     
     sub field_option {
@@ -128,7 +139,12 @@ use Class::Std::Utils; {
         my $field = shift;
         my $value = @_ ? shift : undef;
 
-        return $info{ident $self} -> field_value($field, $value);
+        if (defined $info{ident $self} -> field_value($field, $value)) {
+            return $info{ident $self} -> field_value($field, $value);
+        }
+        else {
+            return '';
+        }
     }
 
     sub CheckPassword {
