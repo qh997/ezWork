@@ -103,6 +103,22 @@ our $PROJ = <<END;
 Type the project number. (*EXISTS*)
 END
 
+our $PROT = <<END;
+Type the project task type number. (*EXISTS*)
+END
+
+our $ACTV = <<END;
+Type the active type number. (*EXISTS*)
+END
+
+our $SACT = <<END;
+Type the sub active type number. (*EXISTS*)
+END
+
+our $MODE = <<END;
+Type the project module number. (*EXISTS*)
+END
+
 our $SEL_ATON = <<END;
 ****************************************************************************
 *                            !!PAY ATTENTION!!                             *
