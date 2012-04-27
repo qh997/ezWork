@@ -60,7 +60,7 @@ use Class::Std::Utils; {
         my $depval = 0;
         if (exists $DEPEND{$field}) {
             $depval = $self -> depend_on($DEPEND{$field});
-            if (!$depval && !$self -> field_value($DEPEND{$field})) {
+            if (!$depval && !$self -> get_field_value($DEPEND{$field})) {
                 $depval = 'NEED_'.$DEPEND{$field};
             }
         }
@@ -68,15 +68,48 @@ use Class::Std::Utils; {
         return $depval;
     }
 
-    sub field_value {
+    sub get_field_value {
         my $self = shift;
         my $field = shift;
-        my $value = @_ ? shift : undef;
-
-        if (defined $value) {
-        }
 
         return $info{ident $self}{$field};
+    }
+
+    sub set_field_value {
+        my $self = shift;
+        my $field = shift;
+        my $value = shift;
+
+        my %CFGS = get_configs();
+
+        open my $UF, '< '.$CFGS{USERLIST};
+        my @user_list = <$UF>;
+        close $UF;
+
+        my $account = $user{ident $self};
+        my $fname = $FIELDS{$field} -> [1];
+        my $evalue = encode64($value);
+
+        foreach my $line (@user_list) {
+            if ($line =~ /^$account:/) {
+                if ($value) {
+                    if ($line =~ /[:;]?$fname</) {
+                        $line =~ s/(?<=(;|:)$fname<).*?(?=;|$)/$evalue/;
+                    }
+                    else {
+                        $line =~ s/(?<!:|;)(?=\n)$/;/;
+                        $line =~ s/(?<=:|;)(?=\n)$/$fname<$evalue/;
+                    }
+                }
+                else {
+                    $line =~ s/(?<=;|:)$fname<[^;]*//;
+                }
+            }
+        }
+
+        open my $OH, '> '.$CFGS{USERLIST};
+        print $OH join '', @user_list;
+        close $OH;
     }
 
     sub get_field_option {
@@ -176,7 +209,7 @@ use Class::Std::Utils; {
         my $depval = '';
         if (exists $DEPEND{$field}) {
             $depval .= $self -> _depend_value($DEPEND{$field});
-            $depval .= $FIELDS{$DEPEND{$field}} -> [1].'='.$self -> field_value($DEPEND{$field}).';';
+            $depval .= $FIELDS{$DEPEND{$field}} -> [1].'='.$self -> get_field_value($DEPEND{$field}).';';
         }
 
         return $depval;

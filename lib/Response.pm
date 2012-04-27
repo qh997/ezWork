@@ -2,7 +2,6 @@ package Response;
 
 use warnings;
 use strict;
-use MIME::Base64;
 use version;
 our $VERSION = qv('0.0.1');
 
@@ -113,11 +112,12 @@ use Class::Std::Utils; {
 
                     $result{ident $self}{command} = 'I+'.$next;
                     if ($ftype eq 'TXT') {
+                        #So far, for doing nothing.
                     }
                     elsif ($ftype eq 'SEL') {
                         $result{ident $self}{content} = get_word('SEL_ATON');
                         my ($empty, $list) = $user{ident $self} -> field_option_print($next);
-                        $result{ident $self}{content} .= $empty ? get_word($list) : $list;
+                        $result{ident $self}{content} .= $empty ? get_word($list) : $list."\n";
                     }
 
                     $result{ident $self}{content} .= get_word_replace_nowarp($next, 'EXISTS' => $evalue).$SPROMPT;
@@ -169,7 +169,15 @@ use Class::Std::Utils; {
                     $result{ident $self}{content} = get_word($word).$HPROMPT;
                 }
             }
+            elsif (my ($field) = $scmd =~ /^I\+(.*)$/) {
+                my $word = $user{ident $self} -> field_value($field, $mesg);
+                
+                $result{ident $self}{command} = _get_next();
+                $result{ident $self}{content} = get_word($word).$HPROMPT;
+            }
             else {
+                $result{ident $self}{command} = _get_next();
+                $result{ident $self}{content} = get_word('INCOMPLETE').$HPROMPT;
             }
         }
         else {
@@ -187,7 +195,7 @@ use Class::Std::Utils; {
     sub get_result {
         my $self = shift;
 
-        return $result{ident $self}{command}.':'._encode64($result{ident $self}{content});
+        return $result{ident $self}{command}.':'.encode64($result{ident $self}{content});
     }
 
     sub _get_next {
@@ -201,11 +209,6 @@ use Class::Std::Utils; {
 
         return $MOVEMENT{$current} if defined $MOVEMENT{$current};
         return 0;
-    }
-    sub _encode64 {
-        my $input = shift;
-
-        return encode_base64($input, '');
     }
 }
 

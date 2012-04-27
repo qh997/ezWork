@@ -3,6 +3,7 @@ package General;
 use warnings;
 use strict;
 use Time::Format;
+use MIME::Base64;
 use version;
 our $VERSION = qv('0.0.1');
 
@@ -12,6 +13,7 @@ our @EXPORT = qw(
     $DEBUG
     %STATUS
     get_configs
+    encode64
     debug
 );
 
@@ -34,6 +36,12 @@ sub get_configs {
     }
 
     return %configs;
+}
+
+sub encode64 {
+    my $input = shift;
+
+    return encode_base64($input, '');
 }
 
 sub debug {

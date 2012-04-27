@@ -50,6 +50,10 @@ our $INV_CMD = <<END;
 Invalid command, use 'h' for help.
 END
 
+our $INV_OPRT = <<END;
+FATAL ERROR : Illegal operation.
+END
+
 our $UKN_CMD = <<END;
 Unkonw system status.
 END
@@ -156,6 +160,18 @@ our $EMPTY_OPTION = <<END;
     ***** The list of option is empty *****
     ****** press <ENTER> to continue ******
 
+END
+
+our $INCOMPLETE = <<END;
+Incomplete function.
+END
+
+our $SET_FIELD = <<END;
+OK! Your Information has been update.
+END
+
+our $ILLEGAL_VALUE = <<END;
+Wrong! DO NOT input ILLEGAL values.
 END
 
 sub get_welcome {

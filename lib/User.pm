@@ -144,16 +144,16 @@ use Class::Std::Utils; {
         my $self = shift;
         my $field = shift;
 
-        my $fvalue = $info{ident $self} -> field_value($field);
+        my $fvalue = $self -> field_value($field);
 
         my $empty = 1;
         my $ret_str = '';
         if (my @opt_list = $info{ident $self} -> get_field_option($field)) {
             $empty = 0;
             foreach my $option (@opt_list) {
-                my ($index, $descr) = @$option;
+                my ($value, $descr) = @$option;
 
-                $ret_str .= "      ($index) $descr\n";
+                $ret_str .= "      ($value) $descr\n";
             }
 
             $ret_str =~ s/^(\s+)(?=\($fvalue\))/    * /sm if $fvalue;
@@ -171,11 +171,41 @@ use Class::Std::Utils; {
         my $field = shift;
         my $value = @_ ? shift : undef;
 
-        if (defined $info{ident $self} -> field_value($field, $value)) {
-            return $info{ident $self} -> field_value($field, $value);
+        if (defined $value) {
+            my $ftype = UserInfo::FieldType($field);
+            if ($ftype eq 'TXT') {
+                if ($value) {
+                    $info{ident $self} -> set_field_value($field, $value);
+                    return 'SET_FIELD';
+                }
+                else {
+                    return 'NOTHING';
+                }
+            }
+            elsif ($ftype eq 'SEL') {
+                if (defined $info{ident $self} -> get_field_option($field)) {
+                    if (my @option = $info{ident $self} -> get_field_option($field)) {
+                        if (grep $value eq $_ -> [0], @option) {
+                            $info{ident $self} -> set_field_value($field, $value);
+                            return 'SET_FIELD';
+                        }
+                        else {
+                            return 'ILLEGAL_VALUE';
+                        }
+                    }
+                    else {
+                        $info{ident $self} -> set_field_value($field, '');
+                        return 'SET_EMPTY';
+                    }
+                }
+                else {
+                    return 'INV_OPRT';
+                }
+            }
         }
         else {
-            return '';
+            my $retvalue = $info{ident $self} -> get_field_value($field, $value);
+            return defined $retvalue ? $retvalue : '';
         }
     }
 
