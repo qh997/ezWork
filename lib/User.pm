@@ -54,7 +54,7 @@ use Class::Std::Utils; {
             else {
                 $password{ident $self} = '';
                 $info{ident $self} -> user('');
-                $lack{ident $self} = 'NEED_ACCOUNT';
+                $lack{ident $self} = 'NEED_PASSWORD';
             }
         }
 
