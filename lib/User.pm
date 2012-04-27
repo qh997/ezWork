@@ -132,21 +132,20 @@ use Class::Std::Utils; {
             return 0 if $account{ident $self};
         }
         else {
-            return $info{ident $self} -> depend_on($next);
+            if (!$lack{ident $self}) {
+                return $info{ident $self} -> depend_on($next);
+            }
         }
 
         return $lack{ident $self};
     }
-
-    sub depend_for {
-        my $self = shift;
-        my $next = shift;
-        
-        
-    }
     
-    sub field_option {
+    sub field_option_frint {
         my $self = shift;
+        my $field = shift;
+        my $exist = @_ ? shift : '';
+
+        
     }
     
     sub field_value {

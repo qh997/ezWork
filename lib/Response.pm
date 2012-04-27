@@ -116,6 +116,8 @@ use Class::Std::Utils; {
                     }
                     elsif ($ftype eq 'SEL') {
                         $result{ident $self}{content} = get_word('SEL_ATON');
+
+                        my $options = $user{ident $self} -> field_option_frint($next, $evalue);
                     }
 
                     $result{ident $self}{content} .= get_word_replace_nowarp($next, 'EXISTS' => $evalue).$SPROMPT;
