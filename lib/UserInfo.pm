@@ -78,6 +78,51 @@ use Class::Std::Utils; {
 
         return $info{ident $self}{$field};
     }
+
+    sub get_field_option {
+        my $self = shift;
+        my $field = shift;
+
+        if ($self -> depend_on($field)) {
+            return undef;
+        }
+        else {
+            my $fname = $FIELDS{$field} -> [1];
+            my $search = $self -> _depend_value($field);
+            my $account = $user{ident $self};
+
+            my %CFGS = get_configs();
+
+            open my $UF, '< '.$CFGS{USEROPTS};
+            my @user_opts = <$UF>;
+            close $UF;
+            my $opts = join '', @user_opts;
+     
+            if ($opts =~ s/.*###$account###(.*?)###$account###.*/$1/s) {
+                my $level = 0;
+                while ($search =~ /(.*?)=(.*?);/g) {
+                    my $sfield = $1;
+                    my $svalue = $2;
+                    $opts =~ s/.*^\*{$level}$svalue.*?\n(.*?)^\*{$level}[^*]+.*/$1/gsm;
+                    $level++;
+                }
+
+                $opts =~ s/.*\*{$level}$fname\n*(.*?)\*{$level}$fname.*/$1/s;
+                my @retval;
+                while ($opts =~ /^\*{$level}([^*].*)$/gm) {
+                    my $str = $1;
+
+                    $str =~ /(.*?)=(.*)/;
+                    push @retval, [$1 => $2];
+                }
+
+                return @retval;
+            }
+            else {
+                return undef;
+            }
+        }
+    }
     
     sub SettingExists {
         my $field = shift;
@@ -122,6 +167,19 @@ use Class::Std::Utils; {
         }
 
         return 1;
+    }
+
+    sub _depend_value {
+        my $self = shift;
+        my $field = shift;
+
+        my $depval = '';
+        if (exists $DEPEND{$field}) {
+            $depval .= $self -> _depend_value($DEPEND{$field});
+            $depval .= $FIELDS{$DEPEND{$field}} -> [1].'='.$self -> field_value($DEPEND{$field}).';';
+        }
+
+        return $depval;
     }
 }
 

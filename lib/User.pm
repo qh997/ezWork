@@ -140,12 +140,30 @@ use Class::Std::Utils; {
         return $lack{ident $self};
     }
     
-    sub field_option_frint {
+    sub field_option_print {
         my $self = shift;
         my $field = shift;
-        my $exist = @_ ? shift : '';
 
-        
+        my $fvalue = $info{ident $self} -> field_value($field);
+
+        my $empty = 1;
+        my $ret_str = '';
+        if (my @opt_list = $info{ident $self} -> get_field_option($field)) {
+            $empty = 0;
+            foreach my $option (@opt_list) {
+                my ($index, $descr) = @$option;
+
+                $ret_str .= "      ($index) $descr\n";
+            }
+
+            $ret_str =~ s/^(\s+)(?=\($fvalue\))/    * /sm if $fvalue;
+        }
+        else {
+            $empty = 1;
+            $ret_str .= 'EMPTY_OPTION';
+        }
+
+        return ($empty, $ret_str);
     }
     
     sub field_value {

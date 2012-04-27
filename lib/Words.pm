@@ -144,11 +144,17 @@ Type the project module number. (*EXISTS*)
 END
 
 our $SEL_ATON = <<END;
-****************************************************************************
-*                            !!PAY ATTENTION!!                             *
-* You SHOULD ONLY use the following values in the parentheses.             *
-* If the list is NULL, you can just press {enter} to set this field empty. *
-****************************************************************************
+  ********************************************
+  *            !!PAY ATTENTION!!             *
+  * You SHOULD ONLY use the following values *
+  * which is in the parentheses.             *
+  ********************************************
+
+END
+
+our $EMPTY_OPTION = <<END;
+    ***** The list of option is empty *****
+    ****** press <ENTER> to continue ******
 
 END
 
