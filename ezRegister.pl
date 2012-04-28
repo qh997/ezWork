@@ -6,7 +6,7 @@ use IO::Socket;
 
 BEGIN {push @INC, q[./lib]};
 use General;
-use UserCommand;
+use CommandAgent;
 
 my %CFGS = get_configs();
 debug('Starting at localhost:'.$CFGS{PORT});
@@ -38,8 +38,8 @@ sub start {
         chomp $buf;
         debug($socket -> peerhost().' => '.$buf);
         
-        my $user_cmd = UserCommand -> new(command => $buf);
+        my $agent = CommandAgent -> new(command => $buf);
 
-        print $socket $user_cmd -> response();
+        print $socket $agent -> response();
     }
 }

@@ -7,7 +7,7 @@ use version;
 our $VERSION = qv('0.0.1');
 
 use General;
-use UserInfo;
+use FieldControl;
 
 use Class::Std::Utils; {
     my %account;
@@ -21,7 +21,7 @@ use Class::Std::Utils; {
 
         $account{ident $self} = '';
         $password{ident $self} = '';
-        $info{ident $self} = UserInfo -> new();
+        $info{ident $self} = FieldControl -> new();
         $lack{ident $self} = 'NEED_ACCOUNT';
         
         return $self;
@@ -172,7 +172,7 @@ use Class::Std::Utils; {
         my $value = @_ ? shift : undef;
 
         if (defined $value) {
-            my $ftype = UserInfo::FieldType($field);
+            my $ftype = FieldControl::FieldType($field);
             if ($ftype eq 'TXT') {
                 if ($value) {
                     $info{ident $self} -> set_field_value($field, $value);

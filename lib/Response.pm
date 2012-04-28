@@ -7,7 +7,7 @@ our $VERSION = qv('0.0.1');
 
 use General;
 use User;
-use UserInfo;
+use FieldControl;
 use Words;
 
 my $HPROMPT = '?> ';
@@ -102,13 +102,13 @@ use Class::Std::Utils; {
         my $ucmd = $command{ident $self}{content};
         if ($ucmd =~ /^i\s+(.*)$/i) {
             my $next = uc $1;
-            if (UserInfo::SettingExists($next)) {
+            if (FieldControl::SettingExists($next)) {
                 if (my $need = $user{ident $self} -> need_for($next)) {
                     $result{ident $self}{content} = get_word($need).$HPROMPT;
                 }
                 else {
                     my $evalue = $user{ident $self} -> field_value($next);
-                    my $ftype = UserInfo::FieldType($next);
+                    my $ftype = FieldControl::FieldType($next);
 
                     $result{ident $self}{command} = 'I+'.$next;
                     if ($ftype eq 'TXT') {

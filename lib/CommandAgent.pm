@@ -1,8 +1,7 @@
-package UserCommand;
+package CommandAgent;
 
 use warnings;
 use strict;
-use MIME::Base64;
 use version;
 our $VERSION = qv('0.0.1');
 
@@ -32,8 +31,8 @@ use Class::Std::Utils; {
         my %args = @_;
         
         if ($args{cmd} =~ /^(.*?):(.*?):(.*?):(.*?)$/) {
-            $resp{ident $self} -> user(account => $1, password => decode_base64($2));
-            $resp{ident $self} -> command(type => $3, content => decode_base64($4));
+            $resp{ident $self} -> user(account => $1, password => decode64($2));
+            $resp{ident $self} -> command(type => $3, content => decode64($4));
             $resp{ident $self} -> analyze();
         }
         else {

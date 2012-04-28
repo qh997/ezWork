@@ -14,6 +14,7 @@ our @EXPORT = qw(
     %STATUS
     get_configs
     encode64
+    decode64
     debug
 );
 
@@ -42,6 +43,12 @@ sub encode64 {
     my $input = shift;
 
     return encode_base64($input, '');
+}
+
+sub decode64 {
+    my $input = shift;
+
+    return decode_base64($input);
 }
 
 sub debug {
