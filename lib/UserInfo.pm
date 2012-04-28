@@ -92,18 +92,13 @@ use Class::Std::Utils; {
 
         foreach my $line (@user_list) {
             if ($line =~ /^$account:/) {
-#                if ($value) {
-                    if ($line =~ /[:;]?$fname</) {
-                        $line =~ s/(?<=(;|:)$fname<).*?(?=;|$)/$evalue/;
-                    }
-                    else {
-                        $line =~ s/(?<!:|;)(?=\n)$/;/;
-                        $line =~ s/(?<=:|;)(?=\n)$/$fname<$evalue/;
-                    }
-#                }
-#                else {
-#                    $line =~ s/(?<=;|:)$fname<[^;]*//;
-#                }
+                if ($line =~ /[:;]?$fname</) {
+                    $line =~ s/(?<=(;|:)$fname<).*?(?=;|$)/$evalue/;
+                }
+                else {
+                    $line =~ s/(?<!:|;)(?=\n)$/;/;
+                    $line =~ s/(?<=:|;)(?=\n)$/$fname<$evalue/;
+                }
             }
         }
 
