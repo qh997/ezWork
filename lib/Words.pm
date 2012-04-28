@@ -43,7 +43,6 @@ our $IHELPLIST = <<END;
     (i actv) Set activity type
     (i sact) Set sub activity type
     (i mode) Set project module
-    (i list) List all fields
 END
 
 our $INV_CMD = <<END;
@@ -101,13 +100,13 @@ Your option list has been successfully update.
 END
 
 our $NOT_VER_PASSWORD = <<END;
-*************************************
-*            !!WARNING!!            *
-* Your password CANNOT be verified. *
-* Please confirm your input or try  *
-* it later.                         *
-* And there is nothing to change.   *
-*************************************
+  ***********************************
+  *           !!WARNING!!           *
+  * Sorry your password CANNOT be   *
+  * verified. Please confirm your   *
+  * input or try it later.          *
+  * And there is nothing to change. *
+  ***********************************
 
 END
 
