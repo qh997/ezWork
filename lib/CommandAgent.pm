@@ -3,10 +3,18 @@ package CommandAgent;
 use warnings;
 use strict;
 use version;
-our $VERSION = qv('0.1.0');
+our $VERSION = qv('0.1.1');
 
 use General;
 use Response;
+
+my $HPROMPT = '?> ';
+my $SPROMPT = ' > ';
+my %PROMPTS = (
+    'HELP' => $HPROMPT,
+    'ACOK' => $HPROMPT,
+    'PWOK' => $HPROMPT,
+);
 
 use Class::Std::Utils; {
     my %resp;
@@ -39,7 +47,10 @@ use Class::Std::Utils; {
     sub response {
         my $self = shift;
 
-        return $resp{ident $self} -> get_result();
+        my ($cmd, $msg) = $resp{ident $self} -> get_result();
+        my $pmt = exists $PROMPTS{$cmd} ? $PROMPTS{$cmd} : $SPROMPT; 
+
+        return $cmd.':'.encode64($msg.$pmt);
     }
 }
 

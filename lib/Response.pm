@@ -3,15 +3,12 @@ package Response;
 use warnings;
 use strict;
 use version;
-our $VERSION = qv('0.1.0');
+our $VERSION = qv('0.1.1');
 
 use General;
 use User;
 use FieldControl;
 use Words;
-
-my $HPROMPT = '?> ';
-my $SPROMPT = ' > ';
 
 my %MOVEMENT = (
     'NULL' => 'HELP',
@@ -76,17 +73,17 @@ use Class::Std::Utils; {
         my $self = shift;
 
         if ($command{ident $self}{type} eq '') {
-            $result{ident $self}{content} = get_welcome().$HPROMPT;
+            $result{ident $self}{content} = get_welcome();
         }
         elsif ($command{ident $self}{type} eq 'HELP') {
             if (!$command{ident $self}{content}) {
-                $result{ident $self}{content} = $HPROMPT;
+                $result{ident $self}{content} = '';
             }
             elsif ($command{ident $self}{content} =~ /^h$/i) {
-                $result{ident $self}{content} = get_word('HELPLIST').$HPROMPT;
+                $result{ident $self}{content} = get_word('HELPLIST');
             }
             elsif ($command{ident $self}{content} =~ /^i$/i) {
-                $result{ident $self}{content} = get_word('IHELPLIST').$HPROMPT;
+                $result{ident $self}{content} = get_word('IHELPLIST');
             }
             else {
                 $self -> get_cmd_response();
@@ -105,7 +102,7 @@ use Class::Std::Utils; {
             my $next = uc $1;
             if (FieldControl::SettingExists($next)) {
                 if (my $need = $user{ident $self} -> need_for($next)) {
-                    $result{ident $self}{content} = get_word($need).$HPROMPT;
+                    $result{ident $self}{content} = get_word($need);
                 }
                 else {
                     my $evalue = $user{ident $self} -> field_value($next);
@@ -121,30 +118,29 @@ use Class::Std::Utils; {
                         $result{ident $self}{content} .= $empty ? get_word($list) : $list."\n";
                         if ($empty == 2) {
                             $result{ident $self}{command} = _get_next();
-                            $result{ident $self}{content} .= $HPROMPT;
                             return;
                         }
                     }
 
-                    $result{ident $self}{content} .= get_word_replace_nowarp($next, 'EXISTS' => $evalue).$SPROMPT;
+                    $result{ident $self}{content} .= get_word_replace_nowarp($next, 'EXISTS' => $evalue);
                 }
             }
             else {
-                $result{ident $self}{content} = get_word('INV_CMD').$HPROMPT;
+                $result{ident $self}{content} = get_word('INV_CMD');
             }
         }
         else {
             if (my $next = _get_next(uc $ucmd)) {
                 if (my $need = $user{ident $self} -> need_for($next)) {
-                    $result{ident $self}{content} = get_word($need).$HPROMPT;
+                    $result{ident $self}{content} = get_word($need);
                 }
                 else {
                     $result{ident $self}{command} = $next;
-                    $result{ident $self}{content} = get_word_nowarp($next).$SPROMPT;
+                    $result{ident $self}{content} = get_word_nowarp($next);
                 }
             }
             else {
-                $result{ident $self}{content} = get_word('INV_CMD').$HPROMPT;
+                $result{ident $self}{content} = get_word('INV_CMD');
             }
         }
     }
@@ -159,35 +155,35 @@ use Class::Std::Utils; {
                 my ($login, $word) = User::Login($mesg);
                 if ($login) {
                     $result{ident $self}{command} = $next;
-                    $result{ident $self}{content} = get_word_replace($word, 'ACCOUNT' => $mesg).$HPROMPT;
+                    $result{ident $self}{content} = get_word_replace($word, 'ACCOUNT' => $mesg);
                 }
                 else {
-                    $result{ident $self}{content} = get_word($word).$HPROMPT;
+                    $result{ident $self}{content} = get_word($word);
                 }
             }
             elsif ($scmd eq 'PSWD') {
                 my ($login, $word) = $user{ident $self} -> register($mesg);
                 if ($login) {
                     $result{ident $self}{command} = $next;
-                    $result{ident $self}{content} = get_word_replace($word, 'ACCOUNT' => $user{ident $self} -> account).$HPROMPT;
+                    $result{ident $self}{content} = get_word_replace($word, 'ACCOUNT' => $user{ident $self} -> account);
                 }
                 else {
-                    $result{ident $self}{content} = get_word($word).$HPROMPT;
+                    $result{ident $self}{content} = get_word($word);
                 }
             }
             elsif (my ($field) = $scmd =~ /^I\+(.*)$/) {
                 my $word = $user{ident $self} -> field_value($field, $mesg);
                 
                 $result{ident $self}{command} = _get_next();
-                $result{ident $self}{content} = get_word($word).$HPROMPT;
+                $result{ident $self}{content} = get_word($word);
             }
             else {
                 $result{ident $self}{command} = _get_next();
-                $result{ident $self}{content} = get_word('INCOMPLETE').$HPROMPT;
+                $result{ident $self}{content} = get_word('INCOMPLETE');
             }
         }
         else {
-            $result{ident $self}{content} = get_word('UKN_CMD').$HPROMPT;
+            $result{ident $self}{content} = get_word('UKN_CMD');
         }
     }
 
@@ -195,13 +191,13 @@ use Class::Std::Utils; {
         my $self = shift;
 
         $result{ident $self}{command} = _get_next();
-        $result{ident $self}{content} = $_[0].$HPROMPT;
+        $result{ident $self}{content} = $_[0];
     }
 
     sub get_result {
         my $self = shift;
 
-        return $result{ident $self}{command}.':'.encode64($result{ident $self}{content});
+        return ($result{ident $self}{command}, $result{ident $self}{content});
     }
 
     sub _get_next {
