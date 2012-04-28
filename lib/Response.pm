@@ -12,11 +12,12 @@ use Words;
 
 my $HPROMPT = '?> ';
 my $SPROMPT = ' > ';
+
 my %MOVEMENT = (
     'NULL' => 'HELP',
-    'A' => 'ACNT',
-    'S' => 'PSWD',
-    'P' => 'HELP',
+    'A'    => 'ACNT',
+    'S'    => 'PSWD',
+    'P'    => 'HELP',
     'ACNT' => 'ACOK',
     'PSWD' => 'PWOK',
     'TASK' => 'HELP',
