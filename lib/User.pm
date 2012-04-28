@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use MIME::Base64;
 use version;
-our $VERSION = qv('0.1.0');
+our $VERSION = qv('0.1.1');
 
 use General;
 use FieldControl;
@@ -170,6 +170,13 @@ use Class::Std::Utils; {
         }
 
         return ($empty, $ret_str);
+    }
+
+    sub get_user_infos {
+        my $self = shift;
+        my %infos;
+
+        return %infos;
     }
     
     sub field_value {

@@ -3,7 +3,7 @@ package Response;
 use warnings;
 use strict;
 use version;
-our $VERSION = qv('0.1.1');
+our $VERSION = qv('0.1.2');
 
 use General;
 use User;
@@ -136,7 +136,14 @@ use Class::Std::Utils; {
                 }
                 else {
                     $result{ident $self}{command} = $next;
-                    $result{ident $self}{content} = get_word_nowarp($next);
+
+                    if ('P' eq uc $ucmd ) {
+                        my %user_infos = $user{ident $self} -> get_user_infos();
+                        $result{ident $self}{content} = get_word_replace('USER_INFOS', %user_infos);
+                    }
+                    else {
+                        $result{ident $self}{content} = get_word_nowarp($next);
+                    }
                 }
             }
             else {

@@ -5,7 +5,7 @@ use strict;
 require Exporter;
 use version;
 
-our $VERSION = qv('0.0.1');
+our $VERSION = qv('0.1.2');
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(
@@ -181,6 +181,25 @@ END
 
 our $ILLEGAL_VALUE = <<END;
 Wrong! DO NOT input ILLEGAL values.
+END
+
+our $USER_INFOS = <<END;
+   *********************
+   * Basic information *
+   *********************
+   Account  : *ACNT*
+   Password : *PSWD*
+
+  ***********************
+  * Project information *
+  ***********************
+  Task        : *TASK*
+  Project     : *PROJ*
+    Task      : *PROT*
+    Active    : *ACTV*
+      Active2 : *SACT*
+    Module    : *MODE*
+
 END
 
 sub get_welcome {
