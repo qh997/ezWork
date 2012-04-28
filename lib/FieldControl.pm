@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use MIME::Base64;
 use version;
-our $VERSION = qv('0.1.0');
+our $VERSION = qv('0.1.1');
 
 use General;
 
@@ -73,6 +73,51 @@ use Class::Std::Utils; {
         my $field = shift;
 
         return $info{ident $self}{$field};
+    }
+
+    sub get_fields_value {
+        my $self = shift;
+
+        my %values;
+        foreach my $field (keys %FIELDS) {
+            $values{$field} = $self -> get_field_value($field);
+        }
+
+        return %values;
+    }
+
+    sub get_value_description {
+        my $self = shift;
+        my $field = shift;
+        my $value = shift;
+
+        my $warn = 0;
+        my $rstr = $value;
+        if (FieldType($field) ne 'SEL') {
+            $warn = $value ? 0 : 1;
+        }
+        else {
+            my @opts = $self -> get_field_option($field);
+            if (@opts) {
+                if (@opts == 1 && !defined $opts[0]) {
+                    $warn = 0;
+                }
+                else {
+                    if (my ($desp) = grep $value eq $_ -> [0], @opts) {
+                        $warn = 0;
+                        $rstr = '('.$desp -> [0].') '.$desp -> [1];
+                    }
+                    else {
+                        $warn = 1;
+                    }
+                }
+            }
+            else {
+                $warn = $value ? 1 : 0;
+            }
+        }
+
+        return ($warn, $rstr);
     }
 
     sub set_field_value {

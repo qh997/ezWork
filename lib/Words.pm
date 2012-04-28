@@ -5,7 +5,7 @@ use strict;
 require Exporter;
 use version;
 
-our $VERSION = qv('0.1.2');
+our $VERSION = qv('0.1.3');
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(
@@ -200,6 +200,10 @@ our $USER_INFOS = <<END;
       Active2 : *SACT*
     Module    : *MODE*
 
+END
+
+our $USER_INFOS_WARN = <<END;
+!!WARNING!! You have *COUNT* problems, please fix them ASAP.
 END
 
 sub get_welcome {

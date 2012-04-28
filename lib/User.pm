@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use MIME::Base64;
 use version;
-our $VERSION = qv('0.1.1');
+our $VERSION = qv('0.1.2');
 
 use General;
 use FieldControl;
@@ -145,6 +145,7 @@ use Class::Std::Utils; {
         my $field = shift;
 
         my $fvalue = $self -> field_value($field);
+        $fvalue = defined $fvalue ? $fvalue : '';
 
         my $empty = 1;
         my $ret_str = '';
@@ -172,11 +173,29 @@ use Class::Std::Utils; {
         return ($empty, $ret_str);
     }
 
-    sub get_user_infos {
+    sub infos_print {
         my $self = shift;
         my %infos;
 
-        return %infos;
+        my $warning = 0;
+        $infos{ACNT} = StrPrtFmt($account{ident $self});
+        $infos{PSWD} = StrPrtFmt($password{ident $self});
+        my %values = $info{ident $self} -> get_fields_value();
+        while (my ($field, $value) = each %values) {
+            if (defined $value) {
+                my ($warn, $str) = $info{ident $self} -> get_value_description($field, $value);
+                $str = StrPrtFmt($str);
+                $str = $warn ? $str.' <!Something wrong!>' : $str;
+                $infos{$field} = $str;
+                $warning += $warn;
+            }
+            else {
+                $infos{$field} = StrPrtFmt(undef).' <!Something wrong!>';
+                $warning++;
+            }
+        }
+
+        return ($warning, %infos);
     }
     
     sub field_value {
@@ -222,7 +241,7 @@ use Class::Std::Utils; {
             }
         }
         else {
-            my $retvalue = $info{ident $self} -> get_field_value($field, $value);
+            my $retvalue = $info{ident $self} -> get_field_value($field);
             return defined $retvalue ? $retvalue : '';
         }
     }
@@ -284,6 +303,13 @@ use Class::Std::Utils; {
             close $OH;
             return 1;
         }
+    }
+
+    sub StrPrtFmt {
+        my $string = shift;
+
+        return !defined $string ? '(undefined)' :
+               $string          ? $string       : '(--empty--)';
     }
 }
 
