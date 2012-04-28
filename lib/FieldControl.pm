@@ -112,7 +112,7 @@ use Class::Std::Utils; {
         my $field = shift;
 
         if ($self -> depend_on($field)) {
-            return undef;
+            return (undef);
         }
         else {
             my $fname = $FIELDS{$field} -> [1];
@@ -147,7 +147,7 @@ use Class::Std::Utils; {
                 return @retval;
             }
             else {
-                return undef;
+                return (undef);
             }
         }
     }

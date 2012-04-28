@@ -119,6 +119,11 @@ use Class::Std::Utils; {
                         $result{ident $self}{content} = get_word('SEL_ATON');
                         my ($empty, $list) = $user{ident $self} -> field_option_print($next);
                         $result{ident $self}{content} .= $empty ? get_word($list) : $list."\n";
+                        if ($empty == 2) {
+                            $result{ident $self}{command} = _get_next();
+                            $result{ident $self}{content} .= $HPROMPT;
+                            return;
+                        }
                     }
 
                     $result{ident $self}{content} .= get_word_replace_nowarp($next, 'EXISTS' => $evalue).$SPROMPT;

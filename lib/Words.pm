@@ -97,7 +97,7 @@ END
 
 our $PASSWORD_CHANGED = <<END;
 Your password has been successfully set.
-Your option has been successfully update.
+Your option list has been successfully update.
 END
 
 our $NOT_VER_PASSWORD = <<END;
@@ -159,6 +159,12 @@ END
 our $EMPTY_OPTION = <<END;
     ***** The list of option is empty *****
     ****** press <ENTER> to continue ******
+
+END
+
+our $NO_OPTION = <<END;
+   ***** You don't have an option list *****
+   ****** use <s> to update the list  ******
 
 END
 

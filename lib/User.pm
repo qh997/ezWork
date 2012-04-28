@@ -149,18 +149,24 @@ use Class::Std::Utils; {
         my $empty = 1;
         my $ret_str = '';
         if (my @opt_list = $info{ident $self} -> get_field_option($field)) {
-            $empty = 0;
-            foreach my $option (@opt_list) {
-                my ($value, $descr) = @$option;
-
-                $ret_str .= "      ($value) $descr\n";
+            if (@opt_list ==1 && !defined $opt_list[0]) {
+                $empty = 2;
+                $ret_str = 'NO_OPTION';
             }
+            else {
+                $empty = 0;
+                foreach my $option (@opt_list) {
+                    my ($value, $descr) = @$option;
 
-            $ret_str =~ s/^(\s+)(?=\($fvalue\))/    * /sm if $fvalue;
+                    $ret_str .= "      ($value) $descr\n";
+                }
+
+                $ret_str =~ s/^(\s+)(?=\($fvalue\))/    * /sm if $fvalue;
+            }
         }
         else {
             $empty = 1;
-            $ret_str .= 'EMPTY_OPTION';
+            $ret_str = 'EMPTY_OPTION';
         }
 
         return ($empty, $ret_str);
@@ -183,10 +189,13 @@ use Class::Std::Utils; {
                 }
             }
             elsif ($ftype eq 'SEL') {
-                if (defined $info{ident $self} -> get_field_option($field)) {
-                    if (my @option = $info{ident $self} -> get_field_option($field)) {
+                if (my @opt_list = $info{ident $self} -> get_field_option($field)) {
+                    if (@opt_list ==1 && !defined $opt_list[0]) {
+                        return 'INV_OPRT';
+                    }
+                    else {
                         if ($value) {
-                            if (grep $value eq $_ -> [0], @option) {
+                            if (grep $value eq $_ -> [0], @opt_list) {
                                 $info{ident $self} -> set_field_value($field, $value);
                                 return 'SET_FIELD';
                             }
@@ -198,13 +207,10 @@ use Class::Std::Utils; {
                             return 'NOTHING';
                         }
                     }
-                    else {
-                        $info{ident $self} -> set_field_value($field, '');
-                        return 'SET_EMPTY';
-                    }
                 }
                 else {
-                    return 'INV_OPRT';
+                    $info{ident $self} -> set_field_value($field, '');
+                    return 'SET_EMPTY';
                 }
             }
         }
@@ -245,7 +251,9 @@ use Class::Std::Utils; {
 
         my $acnt = $account{ident $self};
 
+        debug("Update user option list START.($acnt)");
         my $chk_pass_ol = `perl getuseroptions.pl '$acnt' '$pswd'`;
+        debug("Update user option list STOP.($acnt)");
 
         if ($chk_pass_ol =~ /!ERROR! Invalid username or password!!/) {
             return 0;
