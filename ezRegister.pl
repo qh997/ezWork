@@ -3,6 +3,8 @@
 use warnings;
 use strict;
 use IO::Socket;
+use version;
+our $VERSION = qv('0.1.0');
 
 BEGIN {push @INC, q[./lib]};
 use General;
@@ -33,7 +35,7 @@ close $main_socket;
 sub start {
     my $socket = shift;
 
-    debug($socket);
+    debug('START => '.$socket);
     while (defined (my $buf = <$socket>)) {
         chomp $buf;
         debug($socket -> peerhost().' => '.$buf);
@@ -42,4 +44,5 @@ sub start {
 
         print $socket $agent -> response();
     }
+    debug('STOP  => '.$socket);
 }

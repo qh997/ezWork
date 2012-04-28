@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use MIME::Base64;
 use version;
-our $VERSION = qv('0.0.1');
+our $VERSION = qv('0.1.0');
 
 use General;
 

@@ -3,7 +3,7 @@ package Response;
 use warnings;
 use strict;
 use version;
-our $VERSION = qv('0.0.1');
+our $VERSION = qv('0.1.0');
 
 use General;
 use User;
@@ -67,7 +67,7 @@ use Class::Std::Utils; {
             $command{ident $self}{content} = $args{content} if $args{content};
             $command{ident $self}{content} =~ s/^\s+//;
             $command{ident $self}{content} =~ s/\s+$//;
-            debug("content = ".$command{ident $self}{content});
+            debug('Message = ['.$command{ident $self}{content}.']');
         }
     }
 
