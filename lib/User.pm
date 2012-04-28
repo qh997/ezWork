@@ -29,9 +29,9 @@ use Class::Std::Utils; {
 
     sub account {
         my $self = shift;
-        my $input = @_ ? shift : undef;
+        my $input = @_ ? shift : '';
         
-        if (defined $input) {
+        if ($input) {
             $account{ident $self} = $input;
             $password{ident $self} = '';
             $info{ident $self} -> user('');
@@ -43,9 +43,9 @@ use Class::Std::Utils; {
 
     sub password {
         my $self = shift;
-        my $input = @_ ? shift : undef;
+        my $input = @_ ? shift : '';
 
-        if (defined $input) {
+        if ($input) {
             if ($account{ident $self} && CheckPassword($account{ident $self}, $input)) {
                 $password{ident $self} = $input;
                 $info{ident $self} -> user($account{ident $self});
