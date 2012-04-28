@@ -162,6 +162,10 @@ our $EMPTY_OPTION = <<END;
 
 END
 
+our $SET_EMPTY = <<END;
+This field will set to empty.
+END
+
 our $INCOMPLETE = <<END;
 Incomplete function.
 END

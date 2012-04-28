@@ -60,7 +60,7 @@ use Class::Std::Utils; {
         my $depval = 0;
         if (exists $DEPEND{$field}) {
             $depval = $self -> depend_on($DEPEND{$field});
-            if (!$depval && !$self -> get_field_value($DEPEND{$field})) {
+            if (!$depval && !defined $self -> get_field_value($DEPEND{$field})) {
                 $depval = 'NEED_'.$DEPEND{$field};
             }
         }
@@ -92,7 +92,7 @@ use Class::Std::Utils; {
 
         foreach my $line (@user_list) {
             if ($line =~ /^$account:/) {
-                if ($value) {
+#                if ($value) {
                     if ($line =~ /[:;]?$fname</) {
                         $line =~ s/(?<=(;|:)$fname<).*?(?=;|$)/$evalue/;
                     }
@@ -100,10 +100,10 @@ use Class::Std::Utils; {
                         $line =~ s/(?<!:|;)(?=\n)$/;/;
                         $line =~ s/(?<=:|;)(?=\n)$/$fname<$evalue/;
                     }
-                }
-                else {
-                    $line =~ s/(?<=;|:)$fname<[^;]*//;
-                }
+#                }
+#                else {
+#                    $line =~ s/(?<=;|:)$fname<[^;]*//;
+#                }
             }
         }
 

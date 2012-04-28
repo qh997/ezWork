@@ -185,12 +185,17 @@ use Class::Std::Utils; {
             elsif ($ftype eq 'SEL') {
                 if (defined $info{ident $self} -> get_field_option($field)) {
                     if (my @option = $info{ident $self} -> get_field_option($field)) {
-                        if (grep $value eq $_ -> [0], @option) {
-                            $info{ident $self} -> set_field_value($field, $value);
-                            return 'SET_FIELD';
+                        if ($value) {
+                            if (grep $value eq $_ -> [0], @option) {
+                                $info{ident $self} -> set_field_value($field, $value);
+                                return 'SET_FIELD';
+                            }
+                            else {
+                                return 'ILLEGAL_VALUE';
+                            }
                         }
                         else {
-                            return 'ILLEGAL_VALUE';
+                            return 'NOTHING';
                         }
                     }
                     else {
