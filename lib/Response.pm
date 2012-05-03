@@ -142,10 +142,7 @@ use Class::Std::Utils; {
                     }
                     elsif ('G' eq uc $ucmd) {
                         $result{ident $self}{command} = $next;
-                        my $next_field = $result{ident $self}{command};
-                        $next_field =~ s/^G\+//;
-                        $result{ident $self}{content} .= get_word_replace('GUIDE_TITLE', 'TITLE' => $next_field);
-                        $result{ident $self}{content} .= $self -> _reponse_info($next);
+                        $self -> _guide_reponse();
                     }
                     else {
                         $result{ident $self}{content} = get_word_nowarp($next);
@@ -200,12 +197,7 @@ use Class::Std::Utils; {
 
                 $result{ident $self}{content} = get_word($word);
                 if (GetNext($result{ident $self}{command})) {
-                    my $next_field = $result{ident $self}{command};
-                    $next_field =~ s/^G\+//;
-                    $result{ident $self}{content} .= get_word_replace('GUIDE_TITLE', 'TITLE' => $next_field);
-                    my ($command, $content) = $self -> _reponse_info($result{ident $self}{command});
-                    $result{ident $self}{command} = $command;
-                    $result{ident $self}{content} .= $content;
+                    $self -> _guide_reponse();
                 }
                 else {
                     $result{ident $self}{content} .= get_word('GUIDE_FINISH');
@@ -283,6 +275,17 @@ use Class::Std::Utils; {
         }
 
         return ($retsta, $retstr);
+    }
+
+    sub _guide_reponse {
+        my $self = shift;
+
+        my $next_field = $result{ident $self}{command};
+        $next_field =~ s/^G\+//;
+        $result{ident $self}{content} .= get_word_replace('GUIDE_TITLE', 'TITLE' => $next_field);
+        my ($command, $content) = $self -> _reponse_info($result{ident $self}{command});
+        $result{ident $self}{command} = $command;
+        $result{ident $self}{content} .= $content;
     }
 }
 
