@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use MIME::Base64;
 use version;
-our $VERSION = qv('0.1.2');
+our $VERSION = qv('0.1.3');
 
 use General;
 use FieldControl;
@@ -203,47 +203,52 @@ use Class::Std::Utils; {
         my $field = shift;
         my $value = @_ ? shift : undef;
 
+        my $ret_word = 'ILLEGAL_VALUE';
         if (defined $value) {
             my $ftype = FieldControl::FieldType($field);
             if ($ftype eq 'TXT') {
                 if ($value) {
                     $info{ident $self} -> set_field_value($field, $value);
-                    return 'SET_FIELD';
+
+                    $ret_word = 'SET_FIELD';
                 }
-                else {
-                    return 'NOTHING';
+                elsif ($self -> field_value($field)) {
+                    $ret_word = 'NOTHING';
                 }
             }
             elsif ($ftype eq 'SEL') {
                 if (my @opt_list = $info{ident $self} -> get_field_option($field)) {
-                    if (@opt_list ==1 && !defined $opt_list[0]) {
-                        return 'INV_OPRT';
+                    if (@opt_list == 1 && !defined $opt_list[0]) {
+                        $ret_word = 'INV_OPRT';
                     }
                     else {
                         if ($value) {
                             if (grep $value eq $_ -> [0], @opt_list) {
                                 $info{ident $self} -> set_field_value($field, $value);
-                                return 'SET_FIELD';
-                            }
-                            else {
-                                return 'ILLEGAL_VALUE';
+                                $ret_word = 'SET_FIELD';
                             }
                         }
                         else {
-                            return 'NOTHING';
+                            my $current = $self -> field_value($field);
+                            if (grep $current eq $_ -> [0], @opt_list) {
+                                $ret_word = 'NOTHING';
+                            }
                         }
                     }
                 }
                 else {
                     $info{ident $self} -> set_field_value($field, '');
-                    return 'SET_EMPTY';
+                    $ret_word = 'SET_EMPTY';
                 }
             }
         }
         else {
             my $retvalue = $info{ident $self} -> get_field_value($field);
-            return defined $retvalue ? $retvalue : '';
+            $ret_word = defined $retvalue ? $retvalue : '';
         }
+
+        $info{ident $self} -> user($account{ident $self});
+        return $ret_word;
     }
 
     sub CheckPassword {

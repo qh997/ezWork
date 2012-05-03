@@ -3,7 +3,7 @@ package CommandAgent;
 use warnings;
 use strict;
 use version;
-our $VERSION = qv('0.1.1');
+our $VERSION = qv('0.1.2');
 
 use General;
 use Response;
@@ -48,7 +48,8 @@ use Class::Std::Utils; {
         my $self = shift;
 
         my ($cmd, $msg) = $resp{ident $self} -> get_result();
-        my $pmt = exists $PROMPTS{$cmd} ? $PROMPTS{$cmd} : $SPROMPT; 
+        my $pmt = exists $PROMPTS{$cmd} ? $PROMPTS{$cmd} : $SPROMPT;
+        debug("Return command = [$cmd]"); 
 
         return $cmd.':'.encode64($msg.$pmt);
     }

@@ -5,7 +5,7 @@ use strict;
 require Exporter;
 use version;
 
-our $VERSION = qv('0.1.3');
+our $VERSION = qv('0.1.4');
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(
@@ -30,6 +30,7 @@ END
 our $HELPLIST = <<END;
     (a) Login or creat or change account
     (s) Input or change password
+    (g) Use guide to ste information
     (i) Information edition command
     (p) Print your informations
     (h) Show this help list
@@ -204,6 +205,19 @@ END
 
 our $USER_INFOS_WARN = <<END;
 !!WARNING!! You have *COUNT* problems, please fix them ASAP.
+END
+
+our $GUIDE_FINISH = <<END;
+
+* You have completed the settings.
+* Use the 'p' to view it.
+
+END
+
+our $GUIDE_TITLE = <<END;
+
+====================== *TITLE* ======================
+
 END
 
 sub get_welcome {
