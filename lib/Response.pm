@@ -196,7 +196,7 @@ use Class::Std::Utils; {
                     my $next_field = $result{ident $self}{command};
                     $next_field =~ s/^G\+//;
                     $result{ident $self}{content} .= get_word_replace('GUIDE_TITLE', 'TITLE' => $next_field);
-                    $result{ident $self}{content} .= $self -> _reponse_info($result{ident $self}{command})
+                    $result{ident $self}{content} .= $self -> _reponse_info($result{ident $self}{command});
                 }
                 else {
                     $result{ident $self}{content} .= get_word('GUIDE_FINISH');
