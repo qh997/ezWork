@@ -3,7 +3,7 @@ package Response;
 use warnings;
 use strict;
 use version;
-our $VERSION = qv('0.1.4');
+our $VERSION = qv('0.1.5');
 
 use General;
 use User;
@@ -35,6 +35,15 @@ my %MOVEMENT = (
     'G+ACTV' => 'G+SACT',
     'G+SACT' => 'G+MODE',
     'G+MODE' => 'HELP',
+);
+
+my @LEGIT_COMMAND = (
+    'A',
+    'S',
+    'G',
+    'I',
+    'P',
+    'H',
 );
 
 use Class::Std::Utils; {
@@ -109,15 +118,17 @@ use Class::Std::Utils; {
     sub get_cmd_response {
         my $self = shift;
 
-        my $ucmd = $command{ident $self}{content};
+        my $ucmd = uc $command{ident $self}{content};
         if ($ucmd =~ /^i\s+(.*)$/i) {
-            my $next = uc 'I+'.$1;
+            my $next = 'I+'.$1;
 
             ($result{ident $self}{command}, $result{ident $self}{content})
                 = $self -> _reponse_info($next);
         }
         else {
-            if (my $next = GetNext(uc $ucmd)) {
+            if (grep $_ eq $ucmd, @LEGIT_COMMAND) {
+                my $next = GetNext($ucmd);
+
                 if (my $need = $user{ident $self} -> need_for($next)) {
                     $result{ident $self}{content} = get_word($need);
                 }
