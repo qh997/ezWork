@@ -24,7 +24,7 @@ my $WELCOME = <<END;
 \thostname
 \t***************************
 
-Use 'h' for help list.
+# Use 'h' for help list.
 END
 
 our $HELPLIST = <<END;
@@ -47,15 +47,15 @@ our $IHELPLIST = <<END;
 END
 
 our $INV_CMD = <<END;
-Invalid command, use 'h' for help.
+# Invalid command, use 'h' for help.
 END
 
 our $INV_OPRT = <<END;
-FATAL ERROR : Illegal operation.
+# FATAL ERROR : Illegal operation.
 END
 
 our $UKN_CMD = <<END;
-Unkonw system status.
+# Unkonw system status.
 END
 
 our $ACNT = <<END;
@@ -67,37 +67,37 @@ Input your email password
 END
 
 our $NEED_ACCOUNT = <<END;
-Use 'a' to login frist.
+# Use 'a' to login frist.
 END
 
 our $NEED_PASSWORD = <<END;
-Use 's' to register your account.
+# Use 's' to register your account.
 END
 
 our $LOGIN_ACCOUNT = <<END;
-Login as *ACCOUNT*.
+# Login as *ACCOUNT*.
 END
 
 our $CREAT_ACCOUNT = <<END;
-Creat account *ACCOUNT*, password [neusoft].
+# Creat account *ACCOUNT*, password [neusoft].
 END
 
 our $BAD_ACCOUNT = <<END;
-* Bad of user name.
-* User name CANNOT contain special characters or space.
+# Bad of user name.
+# User name CANNOT contain special characters or space.
 END
 
 our $REGISTER = <<END;
-Register as *ACCOUNT*.
+# Register as *ACCOUNT*.
 END
 
 our $BAD_REGISTER = <<END;
-Invalid password.
+# Invalid password.
 END
 
 our $PASSWORD_CHANGED = <<END;
-Your password has been successfully set.
-Your option list has been successfully update.
+# Your password has been successfully set.
+# Your option list has been successfully update.
 END
 
 our $NOT_VER_PASSWORD = <<END;
@@ -112,7 +112,7 @@ our $NOT_VER_PASSWORD = <<END;
 END
 
 our $NOTHING = <<END;
-Nothing to change.
+# Nothing to change.
 END
 
 our $TASK = <<END;
@@ -124,7 +124,7 @@ Type the project number. (*EXISTS*)
 END
 
 our $NEED_PROJ = <<END;
-You should use 'i proj' to set project frist.
+# You should use 'i proj' to set project frist.
 END
 
 our $PROT = <<END;
@@ -136,7 +136,7 @@ Type the active type number. (*EXISTS*)
 END
 
 our $NEED_ACTV = <<END;
-You should use 'i actv' to set active type frist.
+# You should use 'i actv' to set active type frist.
 END
 
 our $SACT = <<END;
@@ -169,19 +169,19 @@ our $NO_OPTION = <<END;
 END
 
 our $SET_EMPTY = <<END;
-This field will set to empty.
+# This field will set to empty.
 END
 
 our $INCOMPLETE = <<END;
-Incomplete function.
+# Incomplete function.
 END
 
 our $SET_FIELD = <<END;
-OK! Your Information has been update.
+# OK! Your Information has been update.
 END
 
 our $ILLEGAL_VALUE = <<END;
-Wrong! DO NOT input ILLEGAL values.
+# Wrong! DO NOT input ILLEGAL values.
 END
 
 our $USER_INFOS = <<END;
@@ -204,13 +204,13 @@ our $USER_INFOS = <<END;
 END
 
 our $USER_INFOS_WARN = <<END;
-!!WARNING!! You have *COUNT* problems, please fix them ASAP.
+# !!WARNING!! You have *COUNT* problems, please fix them ASAP.
 END
 
 our $GUIDE_FINISH = <<END;
 
-* You have completed the settings.
-* Use the 'p' to view it.
+# You have completed the settings.
+# Use the 'p' to view it.
 
 END
 
