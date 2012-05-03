@@ -112,13 +112,9 @@ use Class::Std::Utils; {
         my $ucmd = $command{ident $self}{content};
         if ($ucmd =~ /^i\s+(.*)$/i) {
             my $next = uc 'I+'.$1;
-            if (GetNext(uc $next)) {
-                $result{ident $self}{command} = $next;
-                $result{ident $self}{content} = $self -> _reponse_info($next);
-            }
-            else {
-                $result{ident $self}{content} = get_word('INV_CMD');
-            }
+
+            ($result{ident $self}{command}, $result{ident $self}{content})
+                = $self -> _reponse_info($next);
         }
         else {
             if (my $next = GetNext(uc $ucmd)) {
@@ -196,7 +192,9 @@ use Class::Std::Utils; {
                     my $next_field = $result{ident $self}{command};
                     $next_field =~ s/^G\+//;
                     $result{ident $self}{content} .= get_word_replace('GUIDE_TITLE', 'TITLE' => $next_field);
-                    $result{ident $self}{content} .= $self -> _reponse_info($result{ident $self}{command});
+                    my ($command, $content) = $self -> _reponse_info($result{ident $self}{command});
+                    $result{ident $self}{command} = $command;
+                    $result{ident $self}{content} .= $content;
                 }
                 else {
                     $result{ident $self}{content} .= get_word('GUIDE_FINISH');
@@ -237,11 +235,13 @@ use Class::Std::Utils; {
         my $self = shift;
         my $next = uc shift;
 
-        my $retstr;
+        my ($retsta, $retstr);
+        $retsta = $next;
         if (GetNext($next)) {
             my ($field) = $next =~ /^(?:I|G)\+(.*)$/;
 
             if (my $need = $user{ident $self} -> need_for($field)) {
+                $retsta = GetNext();
                 $retstr = get_word($need);
             }
             else {
@@ -249,26 +249,29 @@ use Class::Std::Utils; {
                 my $ftype = FieldControl::FieldType($field);
 
                 if ($ftype eq 'TXT') {
-                    #So far, for doing nothing.
+                    $retstr .= get_word_replace_nowarp($field, 'EXISTS' => $evalue);
                 }
                 elsif ($ftype eq 'SEL') {
-                    $retstr = get_word('SEL_ATON');
                     my ($empty, $list) = $user{ident $self} -> field_option_print($field);
-                    $retstr .= $empty ? get_word($list) : $list."\n";
                     if ($empty == 2) {
-                        $retstr = GetNext();
-                        return;
+                        $retsta = GetNext();
+                        $retstr .= get_word($list);
+                    }
+                    else {
+                        $retstr = get_word('SEL_ATON');
+                        $retstr .= $empty ? get_word($list) : $list."\n";
+
+                        $retstr .= get_word_replace_nowarp($field, 'EXISTS' => $evalue);
                     }
                 }
-
-                $retstr .= get_word_replace_nowarp($field, 'EXISTS' => $evalue);
             }
         }
         else {
+            $retsta = GetNext();
             $retstr = get_word('INV_CMD');
         }
 
-        return $retstr;
+        return ($retsta, $retstr);
     }
 }
 

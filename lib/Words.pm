@@ -163,9 +163,8 @@ our $EMPTY_OPTION = <<END;
 END
 
 our $NO_OPTION = <<END;
-   ***** You don't have an option list *****
-   ****** use <s> to update the list  ******
-
+# You don't have an option list.
+# use <s> to update the list.
 END
 
 our $SET_EMPTY = <<END;
