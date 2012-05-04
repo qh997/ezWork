@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use MIME::Base64;
 use version;
-our $VERSION = qv('0.1.1');
+our $VERSION = qv('0.1.2');
 
 use General;
 
@@ -208,6 +208,16 @@ use Class::Std::Utils; {
 
         if (SettingExists($field)) {
             return $FIELDS{$field} -> [0];
+        }
+
+        return 0;
+    }
+    
+    sub FieldName {
+        my $field = shift;
+
+        if (SettingExists($field)) {
+            return $FIELDS{$field} -> [1];
         }
 
         return 0;

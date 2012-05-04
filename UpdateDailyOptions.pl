@@ -101,7 +101,7 @@ while ($project =~ m{<option value="(.*?)">(.*?)</option>}g) {
 }
 $user_str .= "selProject\n";
 $user_str .= "###$USER{NAME}###\n\n";
-print $user_str;
+#print $user_str;
 
 my %CFGS = get_configs();
 
