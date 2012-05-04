@@ -3,8 +3,9 @@ package User;
 use warnings;
 use strict;
 use MIME::Base64;
+use Net::LDAP;
 use version;
-our $VERSION = qv('0.1.3');
+our $VERSION = qv('0.1.4');
 
 use General;
 use FieldControl;
@@ -65,11 +66,11 @@ use Class::Std::Utils; {
         my $account = shift;
         chomp $account;
 
-        if ($account =~ /[@#:!$%^&*();'"`~\/\\ ]/) {
-            return (0, 'BAD_ACCOUNT');
-        }
-        elsif (!$account) {
+        if (!$account) {
             return (0, 'NOTHING');
+        }
+        elsif (LDAP_Verification($account)) {
+            return (0, 'BAD_ACCOUNT');
         }
         else {
             my %CFGS = get_configs();
@@ -308,6 +309,25 @@ use Class::Std::Utils; {
             close $OH;
             return 1;
         }
+    }
+
+    sub LDAP_Verification {
+        my $username = shift;
+
+        my %CFGS = get_configs();
+
+        my $ldap = Net::LDAP -> new('mpc-auth.neusoft.com') or warn $@;
+        my $mesg = $ldap -> bind(
+            'cn='.$CFGS{ADMIN}.', ou=people, dc=neusoft, dc=internal',
+            password => $CFGS{ADMINPW},
+        );
+        $mesg = $ldap -> search(
+            base => 'ou=people,dc=neusoft,dc=internal',
+            filter => "cn=$username"
+        );
+
+        return 0 if $mesg -> entries;
+        return 1;
     }
 
     sub StrPrtFmt {

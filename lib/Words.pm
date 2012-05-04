@@ -5,7 +5,7 @@ use strict;
 require Exporter;
 use version;
 
-our $VERSION = qv('0.1.4');
+our $VERSION = qv('0.1.5');
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(
@@ -84,7 +84,9 @@ END
 
 our $BAD_ACCOUNT = <<END;
 # Bad of user name.
-# User name CANNOT contain special characters or space.
+# Your name can not be found in LDAP.
+# The user name can not contain special characters.
+# Please check your input.
 END
 
 our $REGISTER = <<END;
