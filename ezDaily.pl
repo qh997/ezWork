@@ -3,24 +3,31 @@
 use warnings;
 use strict;
 use LWP;
-use URL::Encode;
+use Time::Format;
+use URL::Encode qw(url_encode);
+use version;
+our $VERSION = qv('0.1.1');
 
-my $NOW_DATE = now_date();
+if (@ARGV < 8) {
+    print "Insufficient parameters.\n";
+    exit 1;
+}
 
 my %USER = (
-    NAME => @ARGV ? shift : '',
-    PSWD => @ARGV ? shift : '',
-    TASK => @ARGV ? shift : '',
-    PROJ => @ARGV ? shift : '',
-    PROT => @ARGV ? shift : '',
-    ACT1 => @ARGV ? shift : '',
-    ACT2 => @ARGV ? shift : '',
-    MOD1 => @ARGV ? shift : '',
+    NAME => shift,
+    PSWD => shift,
+    TASK => shift,
+    PROJ => shift,
+    PROT => shift,
+    ACT1 => shift,
+    ACT2 => shift,
+    MOD1 => shift,
 );
 
 my %URLS = (
     MAIN => 'http://processbase.neusoft.com',
     LOGN => 'http://processbase.neusoft.com/UserLogin.do',
+    DLAD => 'http://processbase.neusoft.com/daily/dailyAdd.jsp',
     RPOT => 'http://processbase.neusoft.com/SaveDaily.do',
 );
 
@@ -33,6 +40,9 @@ my @HEAD = (
     'Connection' => 'keep-alive',
 );
 
+my $NOW_DATE = $time{'yyyy-mm-dd'};
+print "Date : $NOW_DATE\n";
+
 my $browser = LWP::UserAgent -> new();
 my $response = $browser -> get($URLS{MAIN});
 my $cookie = ${$response -> headers}{'set-cookie'};
@@ -41,14 +51,22 @@ push @HEAD, (Cookie => $cookie);
 
 my $logn_para = 'state=login';
 $logn_para .= '&username='.$USER{NAME};
-$logn_para .= '&password='.URL::Encode::url_encode($USER{PSWD});
+$logn_para .= '&password='.url_encode($USER{PSWD});
 $logn_para .= '&selLanguage=en_US&lawEmp=on';
 
 $response = $browser -> post($URLS{LOGN}.'?'.$logn_para, @HEAD);
+$response = $browser -> post($URLS{DLAD}, @HEAD);
 
-my $rpot_para = 'hidState=saveBack';
+my $project = $response -> content;
+unless ($project) {
+    print "Cannot login as <$USER{NAME}> use password [$USER{PSWD}].\n";
+    exit 1;
+}
+
+my $rpot_para = '';
+$rpot_para .= 'hidState=saveBack';
 $rpot_para .= '&txtDate='.$NOW_DATE;
-$rpot_para .= '&txtTask='.URL::Encode::url_encode($USER{TASK});
+$rpot_para .= '&txtTask='.url_encode($USER{TASK});
 $rpot_para .= '&txtTime=8&txtWorkLoad=';
 $rpot_para .= '&selProject='.$USER{PROJ};
 $rpot_para .= '&attribute1=&selProTask='.$USER{PROT};
@@ -58,15 +76,3 @@ $rpot_para .= '&selModule1='.$USER{MOD1};
 $rpot_para .= '&selModule2=&selResult=&txtResValue=&txtRemark=';
 
 $response = $browser -> post($URLS{RPOT}.'?'.$rpot_para, @HEAD);
-
-sub now_date {
-    my $NowTime = time();
-    my ($year, $month, $day, $hour, $min, $sec);
-    $year = (localtime($NowTime))[5] + 1900;
-    $month = (localtime($NowTime))[4] + 1;
-    $month =~ s/^(\d{1})$/0$1/;
-    $day = (localtime($NowTime))[3];
-    $day =~ s/^(\d{1})$/0$1/;
-
-    return "$year-$month-$day";
-}
