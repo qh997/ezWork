@@ -3,10 +3,17 @@
 use warnings;
 use strict;
 use MIME::Base64;
+use version;
+our $VERSION = qv('0.1.1');
+
+BEGIN {push @INC, q[./lib]};
+use General;
 
 my $SPECUSER = @ARGV ? shift : '';
-my $USERFILE = '/home/gengs/develops/ezWork/accounts';
-my $USERSELS = '/home/gengs/develops/ezWork/useroptions';
+
+my %CFGS = get_configs();
+my $USERFILE = $CFGS{USERLIST};
+my $USERSELS = $CFGS{USEROPTS};
 
 my %FIELDSDEF = (
     TASK => 'txtTask',
