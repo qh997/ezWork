@@ -3,11 +3,16 @@
 use warnings;
 use strict;
 use LWP;
-use URL::Encode;
+use URL::Encode qw(url_encode);
+use version;
+our $VERSION = qv('0.1.2');
+
+BEGIN {push @INC, q[./lib]};
+use General;
 
 my %USER = (
-    NAME => @ARGV ? shift @ARGV : 'gengs',
-    PSWD => @ARGV ? shift @ARGV : 'gengs@NEU3',
+    NAME => shift,
+    PSWD => shift,
 );
 
 my %URLS = (
@@ -33,7 +38,7 @@ push @HEAD, (Cookie => $cookie);
 
 my $logn_para = 'state=login';
 $logn_para .= '&username='.$USER{NAME};
-$logn_para .= '&password='.URL::Encode::url_encode($USER{PSWD});
+$logn_para .= '&password='.url_encode($USER{PSWD});
 $logn_para .= '&selLanguage=en_US&lawEmp=on';
 
 $response = $browser -> post($URLS{LOGN}.'?'.$logn_para, @HEAD);
@@ -41,10 +46,10 @@ $response = $browser -> post($URLS{DLAD}, @HEAD);
 my $project = $response -> content;
 
 unless ($project) {
-    print "!ERROR! Invalid username or password!!\n";
-
+    print "Invalid username or password.\n";
     exit 1;
 }
+
 $project =~ s{.*name="selProject" id="selProject".*?</OPTION>(.*?)</select>.*}{$1}s;
 
 my $user_str = "###$USER{NAME}###\n";
@@ -98,7 +103,9 @@ $user_str .= "selProject\n";
 $user_str .= "###$USER{NAME}###\n\n";
 print $user_str;
 
-open my $RH, '< /home/gengs/develops/ezWork/useroptions';
+my %CFGS = get_configs();
+
+open my $RH, '< '.$CFGS{USEROPTS};
 my @usfile = <$RH>;
 close $RH;
 
@@ -107,24 +114,6 @@ unless ($filestr =~ s/###$USER{NAME}###.*###$USER{NAME}###\n+/$user_str/s) {
     $filestr .= $user_str;
 }
 
-open my $WH, '> /home/gengs/develops/ezWork/useroptions';
+open my $WH, '> '.$CFGS{USEROPTS};
 print $WH $filestr;
 close $WH;
-
-sub get_options {
-    my $opt_str = shift;
-
-    $opt_str =~ s/'//g;
-    my @opt_str_l = split ',', $opt_str;
-
-    my $retval = {};
-    foreach my $gp_num (1..@opt_str_l/2) {
-        my $index = $gp_num * 2 -2;
-
-        my $option_index = $opt_str_l[$index++];
-        next unless $option_index;
-
-        ${$retval}{$option_index} = $opt_str_l[$index];
-    }
-    return $retval;
-}

@@ -283,10 +283,10 @@ use Class::Std::Utils; {
         my $acnt = $account{ident $self};
 
         debug("Update user option list START.($acnt)");
-        my $chk_pass_ol = `perl getuseroptions.pl '$acnt' '$pswd'`;
+        my $chk_pass_ol = `perl UpdateDailyOptions.pl '$acnt' '$pswd'`;
         debug("Update user option list STOP.($acnt)");
 
-        if ($chk_pass_ol =~ /!ERROR! Invalid username or password!!/) {
+        if ($chk_pass_ol =~ /Invalid username or password/) {
             return 0;
         }
         else {

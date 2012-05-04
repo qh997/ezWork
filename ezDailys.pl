@@ -36,9 +36,9 @@ foreach my $l (@userlist) {
 
             print "Reporting for $user_name\n";
 
-            my $chk_pass_ol = `perl /home/gengs/develops/ezWork/getuseroptions.pl '$user_name' '$user_pass'`;
+            my $chk_pass_ol = `perl UpdateDailyOptions.pl '$user_name' '$user_pass'`;
 
-            if ($chk_pass_ol =~ /!ERROR! Invalid username or password!!/) {
+            if ($chk_pass_ol =~ /Invalid username or password/) {
                 print "!!WARNING!! Account [$user_name] can not be verified.\n";
             }
             else {
@@ -46,7 +46,7 @@ foreach my $l (@userlist) {
                     print "!!WARNING!! Account [$user_name] has wrong setting in field [$err].\n";
                 }
                 else {
-                    my $reportstr = "perl /home/gengs/develops/ezWork/ezDaily.pl '$user_name' '$user_pass' ";
+                    my $reportstr = "perl ezDaily.pl '$user_name' '$user_pass' ";
                     foreach my $key ('TASK','PROJ','PROT','ACTV','SACT','PROM') {
                         $reportstr .= "'".get_field_info($user_name, $FIELDSDEF{$key})."' ";
                     }
