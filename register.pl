@@ -6,9 +6,8 @@ use IO::Socket;
 use IO::Select;
 use MIME::Base64;
 
-my $SERVER = @ARGV ? shift : 'backup1';
+chomp(my $SERVER = @ARGV ? shift : 'backup1');
 my $PORT   = '8321';
-chomp $SERVER;
 
 my $socket = IO::Socket::INET -> new(
     PeerAddr => $SERVER,
@@ -49,8 +48,7 @@ until ($commd eq 'HELP' && $input eq 'q') {
             print "*" if $paswd eq '';
             print "] ";
         }
-        $input = <STDIN>;
-        chomp $input;
+        chomp($input = <>);
 
         $acupt = $input if $commd eq 'ACNT';
         if ($commd eq 'PSWD') {
