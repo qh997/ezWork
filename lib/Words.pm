@@ -95,6 +95,7 @@ END
 
 our $BAD_REGISTER = <<END;
 # Invalid password.
+# The initial password is "neusoft".
 END
 
 our $PASSWORD_CHANGED = <<END;
