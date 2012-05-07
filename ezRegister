@@ -4,7 +4,7 @@ start()
 {
     echo "start ezRegister"
     cd /home/gengs/develops/ezWork/
-    /home/gengs/develops/ezWork/ezRegister.pl &
+    /home/gengs/develops/ezWork/ezRegister.pl >> /home/gengs/ezRegister.log &
     exit 0;
 }
 stop()
