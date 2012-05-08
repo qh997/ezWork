@@ -54,7 +54,6 @@ sub get_program_replace {
 
     while (my ($ori, $tar) = each %replace) {
         $tar =~ s/'/\\'/g;
-        $tar =~ s/"/\\"/g;
         $str =~ s/\*$ori\*/$tar/g;
     }
 

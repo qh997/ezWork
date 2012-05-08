@@ -19,6 +19,9 @@ my %PROMPTS = (
 
 use Class::Std::Utils; {
     my %resp;
+    my %acnt;
+    my %pswd;
+    my %type;
     my %cont;
 
     sub new {
@@ -26,6 +29,9 @@ use Class::Std::Utils; {
         my $self = bless anon_scalar(), $class;
 
         $resp{ident $self} = Response -> new();
+        $acnt{ident $self} = '';
+        $pswd{ident $self} = '';
+        $type{ident $self} = '';
         $cont{ident $self} = '';
         
         $self -> command_analyze(cmd => $args{command}) if $args{command};
@@ -37,11 +43,20 @@ use Class::Std::Utils; {
         my $self = shift;
         my %args = @_;
 
-        if (my ($acnt, $pswd, $type, $c) = $args{cmd} =~ /^(.*?):(.*?):(.*?):(.*?)$/) {
-            $cont{ident $self} = decode64($c);
-            if ($type) {
-                $resp{ident $self} -> user(account => $acnt, password => decode64($pswd));
-                $resp{ident $self} -> command(type => $type, content => $cont{ident $self});
+        if ($args{cmd} =~ /^(.*?):(.*?):(.*?):(.*?)$/) {
+            $acnt{ident $self} = $1;
+            $pswd{ident $self} = decode64($2);
+            $type{ident $self} = $3;
+            $cont{ident $self} = decode64($4);
+            if ($type{ident $self}) {
+                $resp{ident $self} -> user(
+                    account => $acnt{ident $self},
+                    password => $pswd{ident $self},
+                );
+                $resp{ident $self} -> command(
+                    type => $type{ident $self},
+                    content => $cont{ident $self},
+                );
             }
             else {
                 $resp{ident $self} -> command(type => 'HELP', content => 'A');
@@ -77,8 +92,15 @@ use Class::Std::Utils; {
             $resp .= get_program('USER_INPUT');
         }
         else {
-            $resp .= get_program_replace('MSG_PRINT', MSG => $msg.$pmt);
-            $resp .= get_program('USER_INPUT');
+            if (!$acnt{ident $self} && $cmd ne 'ACNT') {
+                $resp .= get_program_replace('CHANGE_CMD', CMD => 'HELP');
+                $resp .= get_program_replace('MSG_PRINT', MSG => $msg);
+                $resp .= get_program_replace('USER_INPUT_AGENT', INPUT => 'A');
+            }
+            else {
+                $resp .= get_program_replace('MSG_PRINT', MSG => $msg.$pmt);
+                $resp .= get_program('USER_INPUT');
+            }
         }
 
         return encode64($resp);

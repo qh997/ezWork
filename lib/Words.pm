@@ -28,8 +28,8 @@ my $WELCOME = <<END;
 END
 
 our $HELPLIST = <<END;
-    (a) Login, creat or change account
-    (s) Input or change password
+    (a) Change account
+    (s) Change password
     (g) Use guide to set information (Recommend)
     (i) Information edition command
     (p) Print your informations
