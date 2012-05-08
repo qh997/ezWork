@@ -17,45 +17,14 @@ my $socket = IO::Socket::INET -> new(
 ) or die "Can not create socket connection to server : <$SERVER>.\n$@";
 
 my $acunt = '';
-my $acupt = '';
 my $paswd = '';
-my $paspt = '';
 my $commd = '';
 my $input = '';
 until ($commd eq 'HELP' && $input eq 'q') {
-    my $serstr = talk();
+    my $ser_cmd = decode_base64(talk());
 
-    if ($serstr =~ /^(.*?):(.*)$/) {
-        my $s_cmd = $1;
-        my $msg = decode_base64($2);
-
-        $commd = $s_cmd;
-        if ($s_cmd eq 'PWOK') {
-            $commd = 'HELP';
-            $paswd = $paspt;
-        }
-        elsif ($s_cmd eq 'ACOK') {
-            $commd = 'HELP';
-            $acunt = $acupt;
-            $paswd = '';
-        }
-        $paspt = '';
-        $acupt = '';
-
-        print $msg;
-        if ($acunt ne '') {
-            print "[$acunt";
-            print "*" if $paswd eq '';
-            print "] ";
-        }
-        chomp($input = <>);
-
-        $acupt = $input if $commd eq 'ACNT';
-        if ($commd eq 'PSWD') {
-            $paspt = encode_base64($input);
-            chomp $paspt;
-        }
-    }
+    eval $ser_cmd;
+    die $@ if $@;
 }
 
 $socket -> close() or die "Close Socket failed.$@";

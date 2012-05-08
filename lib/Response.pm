@@ -55,7 +55,7 @@ use Class::Std::Utils; {
         my $class = shift;
         my $self = bless anon_scalar(), $class;
 
-        $user{ident $self} = undef;
+        $user{ident $self} = User -> new();
         $command{ident $self} = {
             type => '',
             content => '',
@@ -72,7 +72,6 @@ use Class::Std::Utils; {
         my $self = shift;
         my %args = @_ ? @_ : ();
 
-        $user{ident $self} = User -> new();
         $user{ident $self} -> account($args{account});
         $user{ident $self} -> password($args{password});
     }
@@ -90,13 +89,16 @@ use Class::Std::Utils; {
         }
     }
 
+    sub welcome {
+        my $self = shift;
+
+        $result{ident $self}{content} = get_welcome();
+    }
+
     sub analyze {
         my $self = shift;
 
-        if ($command{ident $self}{type} eq '') {
-            $result{ident $self}{content} = get_welcome();
-        }
-        elsif ($command{ident $self}{type} eq 'HELP') {
+        if ($command{ident $self}{type} eq 'HELP') {
             if (!$command{ident $self}{content}) {
                 $result{ident $self}{content} = '';
             }
@@ -130,14 +132,14 @@ use Class::Std::Utils; {
                 my $next = GetNext($ucmd);
 
                 if (my $need = $user{ident $self} -> need_for($next)) {
-                    $result{ident $self}{content} = get_word($need);
+                    $result{ident $self}{content} .= get_word($need);
                 }
                 else {
                     $result{ident $self}{command} = $next;
 
                     if ('P' eq uc $ucmd) {
                         my ($warning, %user_infos) = $user{ident $self} -> infos_print();
-                        $result{ident $self}{content} = get_word_replace('USER_INFOS', %user_infos);
+                        $result{ident $self}{content} .= get_word_replace('USER_INFOS', %user_infos);
                         $result{ident $self}{content} .= get_word_replace('USER_INFOS_WARN', COUNT => $warning) if $warning;
                     }
                     elsif ('G' eq uc $ucmd) {
@@ -145,12 +147,12 @@ use Class::Std::Utils; {
                         $self -> _guide_reponse();
                     }
                     else {
-                        $result{ident $self}{content} = get_word_nowarp($next);
+                        $result{ident $self}{content} .= get_word_nowarp($next);
                     }
                 }
             }
             else {
-                $result{ident $self}{content} = get_word('INV_CMD');
+                $result{ident $self}{content} .= get_word('INV_CMD');
             }
         }
     }
@@ -165,27 +167,27 @@ use Class::Std::Utils; {
                 my ($login, $word) = User::Login($mesg);
                 if ($login) {
                     $result{ident $self}{command} = $next;
-                    $result{ident $self}{content} = get_word_replace($word, 'ACCOUNT' => $mesg);
+                    $result{ident $self}{content} .= get_word_replace($word, 'ACCOUNT' => $mesg);
                 }
                 else {
-                    $result{ident $self}{content} = get_word($word);
+                    $result{ident $self}{content} .= get_word($word);
                 }
             }
             elsif ($scmd eq 'PSWD') {
                 my ($login, $word) = $user{ident $self} -> register($mesg);
                 if ($login) {
                     $result{ident $self}{command} = $next;
-                    $result{ident $self}{content} = get_word_replace($word, 'ACCOUNT' => $user{ident $self} -> account);
+                    $result{ident $self}{content} .= get_word_replace($word, 'ACCOUNT' => $user{ident $self} -> account);
                 }
                 else {
-                    $result{ident $self}{content} = get_word($word);
+                    $result{ident $self}{content} .= get_word($word);
                 }
             }
             elsif (my ($field) = $scmd =~ /^I\+(.*)$/) {
                 my $word = $user{ident $self} -> field_value($field, $mesg);
                 
                 $result{ident $self}{command} = GetNext();
-                $result{ident $self}{content} = get_word($word);
+                $result{ident $self}{content} .= get_word($word);
             }
             elsif (($field) = $scmd =~ /^G\+(.*)$/) {
                 my $word = $user{ident $self} -> field_value($field, $mesg);
@@ -195,7 +197,7 @@ use Class::Std::Utils; {
                     $result{ident $self}{command} = $scmd;
                 }
 
-                $result{ident $self}{content} = get_word($word);
+                $result{ident $self}{content} .= get_word($word);
                 if (GetNext($result{ident $self}{command})) {
                     $self -> _guide_reponse();
                 }
@@ -205,11 +207,11 @@ use Class::Std::Utils; {
             }
             else {
                 $result{ident $self}{command} = GetNext();
-                $result{ident $self}{content} = get_word('INCOMPLETE');
+                $result{ident $self}{content} .= get_word('INCOMPLETE');
             }
         }
         else {
-            $result{ident $self}{content} = get_word('UKN_CMD');
+            $result{ident $self}{content} .= get_word('UKN_CMD');
         }
     }
 
@@ -217,7 +219,7 @@ use Class::Std::Utils; {
         my $self = shift;
 
         $result{ident $self}{command} = GetNext();
-        $result{ident $self}{content} = $_[0];
+        $result{ident $self}{content} .= $_[0];
     }
 
     sub get_result {
