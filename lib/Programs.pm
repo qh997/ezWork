@@ -5,7 +5,7 @@ use strict;
 require Exporter;
 use version;
 
-our $VERSION = qv('0.1.0');
+our $VERSION = qv('0.1.1');
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(

@@ -3,7 +3,7 @@ package CommandAgent;
 use warnings;
 use strict;
 use version;
-our $VERSION = qv('0.1.2');
+our $VERSION = qv('0.1.3');
 
 use General;
 use Response;
@@ -81,6 +81,9 @@ use Class::Std::Utils; {
 
         if ($cmd eq 'ACOK') {
             $resp .= get_program_replace('LOGIN', ACNT => $cont{ident $self});
+            if (CheckInitPassword($cont{ident $self})) {
+                $resp .= get_program_replace('REGISTER', PSWD => 'neusoft');
+            }
             $resp .= get_program_replace('CHANGE_CMD', CMD => 'HELP');
             $resp .= get_program_replace('MSG_PRINT', MSG => $msg);
             $resp .= get_program_replace('USER_INPUT_AGENT', INPUT => 'S');
@@ -104,6 +107,25 @@ use Class::Std::Utils; {
         }
 
         return encode64($resp);
+    }
+
+    sub CheckInitPassword {
+        my $account = shift;
+
+        my $chk = Response -> new();
+        $chk -> user(
+            account => $account,
+            password => '',
+        );
+        $chk -> command(
+            type => 'PSWD',
+            content => 'neusoft',
+        );
+        $chk -> analyze();
+        my ($cmd, $msg) = $chk -> get_result();
+        print $cmd."\n";
+        print $msg."\n";
+        return $cmd eq 'PWOK' ? 1 : 0;
     }
 }
 

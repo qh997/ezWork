@@ -5,7 +5,7 @@ use strict;
 require Exporter;
 use version;
 
-our $VERSION = qv('0.1.5');
+our $VERSION = qv('0.1.6');
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(
@@ -29,7 +29,7 @@ END
 
 our $HELPLIST = <<END;
     (a) Change account
-    (s) Change password
+    (s) Register or change password
     (g) Use guide to set information (Recommend)
     (i) Information edition command
     (p) Print your informations
@@ -79,7 +79,7 @@ our $LOGIN_ACCOUNT = <<END;
 END
 
 our $CREAT_ACCOUNT = <<END;
-# Creat account *ACCOUNT*, password [neusoft].
+# Creat account *ACCOUNT*.
 END
 
 our $BAD_ACCOUNT = <<END;
@@ -95,7 +95,6 @@ END
 
 our $BAD_REGISTER = <<END;
 # Invalid password.
-# The initial password is "neusoft".
 END
 
 our $PASSWORD_CHANGED = <<END;
@@ -104,14 +103,10 @@ our $PASSWORD_CHANGED = <<END;
 END
 
 our $NOT_VER_PASSWORD = <<END;
-  ***********************************
-  *           !!WARNING!!           *
-  * Sorry your password CANNOT be   *
-  * verified. Please confirm your   *
-  * input or try it later.          *
-  * And there is nothing to change. *
-  ***********************************
-
+# Sorry your password CANNOT be verified.
+# Your password should be the same as your email password.
+# Please confirm your input or try it later.
+# And there is nothing to change.
 END
 
 our $NOTHING = <<END;
@@ -196,12 +191,12 @@ our $USER_INFOS = <<END;
   ***********************
   * Project information *
   ***********************
-  Task        : *TASK*
-  Project     : *PROJ*
-    Task      : *PROT*
-    Active    : *ACTV*
-      Active2 : *SACT*
-    Module    : *MODE*
+  Task      : *TASK*
+  Project   : *PROJ*
+   Task     : *PROT*
+   Active   : *ACTV*
+    Active2 : *SACT*
+   Module   : *MODE*
 
 END
 
