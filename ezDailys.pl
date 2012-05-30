@@ -45,10 +45,10 @@ foreach (@userlist) {
             my $user_info = FieldControl -> new();
             $user_info -> user($user -> account);
 
-            my $reportstr = '"'.$user -> account.'" "'.$user -> password.'"';
+            my $reportstr = "'".$user -> account."' '".$user -> password."'";
             my %infos = $user_info -> get_fields_value;
             foreach my $key ('TASK','PROJ','PROT','ACTV','SACT','MODE') {
-                $reportstr .= ' "'.$infos{$key}.'"';
+                $reportstr .= " '".$infos{$key}."'";
             }
 
             debug('perl ezDaily.pl '.$reportstr);
