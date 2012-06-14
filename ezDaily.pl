@@ -24,6 +24,10 @@ my %USER = (
     MOD1 => shift,
 );
 
+my $NOW_DATE = @ARGV ? shift : $time{'yyyy-mm-dd'};
+$NOW_DATE = $time{'yyyy-mm-dd'} unless $NOW_DATE =~ /^\d{4}-\d{2}-\d{2}$/;
+print "Date : $NOW_DATE\n";
+
 my %URLS = (
     MAIN => 'http://processbase.neusoft.com',
     LOGN => 'http://processbase.neusoft.com/UserLogin.do',
@@ -40,12 +44,9 @@ my @HEAD = (
     'Connection' => 'keep-alive',
 );
 
-my $NOW_DATE = $time{'yyyy-mm-dd'};
-print "Date : $NOW_DATE\n";
-
-my $browser = LWP::UserAgent -> new();
-my $response = $browser -> get($URLS{MAIN});
-my $cookie = ${$response -> headers}{'set-cookie'};
+my $browser = LWP::UserAgent->new();
+my $response = $browser->get($URLS{MAIN});
+my $cookie = ${$response->headers}{'set-cookie'};
 $cookie =~ s/(.*?);.*/$1/;
 push @HEAD, (Cookie => $cookie);
 
@@ -54,10 +55,10 @@ $logn_para .= '&username='.$USER{NAME};
 $logn_para .= '&password='.url_encode($USER{PSWD});
 $logn_para .= '&selLanguage=en_US&lawEmp=on';
 
-$response = $browser -> post($URLS{LOGN}.'?'.$logn_para, @HEAD);
-$response = $browser -> post($URLS{DLAD}, @HEAD);
+$response = $browser->post($URLS{LOGN}.'?'.$logn_para, @HEAD);
+$response = $browser->post($URLS{DLAD}, @HEAD);
 
-my $project = $response -> content;
+my $project = $response->content;
 unless ($project) {
     print "Cannot login as <$USER{NAME}> use password [$USER{PSWD}].\n";
     exit 1;
@@ -75,4 +76,4 @@ $rpot_para .= '&selActType2='.$USER{ACT2};
 $rpot_para .= '&selModule1='.$USER{MOD1};
 $rpot_para .= '&selModule2=&selResult=&txtResValue=&txtRemark=';
 
-$response = $browser -> post($URLS{RPOT}.'?'.$rpot_para, @HEAD);
+$response = $browser->post($URLS{RPOT}.'?'.$rpot_para, @HEAD);

@@ -11,6 +11,11 @@ use User;
 use FieldControl;
 
 my $SPECUSER = @ARGV ? shift : '';
+my $SPECDATE = '';
+if ($SPECUSER =~ /^\d{4}-\d{2}-\d{2}$/) {
+    $SPECDATE = $SPECUSER;
+    $SPECUSER = '';
+}
 
 debug('Start ezDailys.');
 
@@ -25,31 +30,33 @@ foreach (@userlist) {
     chomp $user_line;
 
     if ($user_line =~ /^(.*?):(.*?):(.*)$/) {
-        my $user = User -> new();
-        $user -> account($1);
-        $user -> password(decode64($2));
-        next if ($SPECUSER && ($SPECUSER ne $user -> account));
+        my $user = User->new();
+        $user->account($1);
+        $user->password(decode64($2));
+        next if ($SPECUSER && ($SPECUSER ne $user->account));
 
-        debug($user -> account);
+        debug($user->account);
 
-        system("perl UpdateDailyOptions.pl '".$user -> account."' '".$user -> password."'")
-            and do {debug($user -> account." can not be verified."); next;};
+        system("perl UpdateDailyOptions.pl '".$user->account."' '".$user->password."'")
+            and do {debug($user->account." can not be verified."); next;};
 
-        my ($warning, undef) = $user -> infos_print();
+        my ($warning, undef) = $user->infos_print();
 
         if ($warning) {
-            debug($user -> account." has $warning problems.");
+            debug($user->account." has $warning problems.");
             next;
         }
         else {
-            my $user_info = FieldControl -> new();
-            $user_info -> user($user -> account);
+            my $user_info = FieldControl->new();
+            $user_info->user($user->account);
 
-            my $reportstr = "'".$user -> account."' '".$user -> password."'";
-            my %infos = $user_info -> get_fields_value;
+            my $reportstr = "'".$user->account."' '".$user->password."'";
+            my %infos = $user_info->get_fields_value;
             foreach my $key ('TASK','PROJ','PROT','ACTV','SACT','MODE') {
                 $reportstr .= " '".$infos{$key}."'";
             }
+
+            $reportstr .= " '".$SPECDATE."'" if $SPECDATE;
 
             debug('perl ezDaily.pl '.$reportstr);
             `perl ezDaily.pl $reportstr`;
