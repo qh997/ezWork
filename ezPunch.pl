@@ -27,6 +27,8 @@ my @HEAD = (
     'Connection' => 'keep-alive',
 );
 
+print($USER{NAME}.' - '.now_time()."\n");
+
 my $browser = LWP::UserAgent -> new();
 my $response = $browser -> get($URLS{INDX}, @HEAD);
 $response -> is_success or die "Cannot get $URLS{INDX} -- ", $response -> status_line;
@@ -65,3 +67,21 @@ my $rcod_para = 'currentempoid='.$tempoid;
 $response = $browser -> post("$URLS{RCOD}?$rcod_para", @HEAD);
 
 exit 0;
+
+sub now_time {
+    my $NowTime = time();
+    my ($year, $month, $day, $hour, $min, $sec);
+    $year = (localtime($NowTime))[5] + 1900;
+    $month = (localtime($NowTime))[4] + 1;
+    $month =~ s/^(\d{1})$/0$1/;
+    $day = (localtime($NowTime))[3];
+    $day =~ s/^(\d{1})$/0$1/;
+    $hour = (localtime($NowTime))[2];
+    $hour =~ s/^(\d{1})$/0$1/;
+    $min = (localtime($NowTime))[1];
+    $min =~ s/^(\d{1})$/0$1/;
+    $sec = (localtime($NowTime))[0];
+    $sec =~ s/^(\d{1})$/0$1/;
+
+    return "$year/$month/$day $hour:$min:$sec";
+}
