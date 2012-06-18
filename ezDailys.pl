@@ -3,7 +3,7 @@
 use warnings;
 use strict;
 use version;
-our $VERSION = qv('0.1.2');
+our $VERSION = qv('0.1.3');
 
 BEGIN {push @INC, q[./lib]};
 use General;

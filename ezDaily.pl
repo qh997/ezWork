@@ -6,7 +6,7 @@ use LWP;
 use Time::Format;
 use URL::Encode qw(url_encode);
 use version;
-our $VERSION = qv('0.1.1');
+our $VERSION = qv('0.1.2');
 
 if (@ARGV < 8) {
     print "Insufficient parameters.\n";

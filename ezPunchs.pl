@@ -14,7 +14,7 @@ my $VARIN = 60 *  4 + 27;
 my $RANGE = 60 * 18 + 41;
 my $ROUND = 5;
 
-print "$NOW_DATE:$NOW_WEEK\n";
+print "\n$NOW_DATE:$NOW_WEEK\n";
 
 open my $UF, "< $USERFILE";
 my @userlist = <$UF>;
@@ -77,7 +77,7 @@ foreach my $user (@userlist) {
 
 wait();
 sleep 1;
-print "Finished.\n";
+print "$NOW_DATE:$NOW_WEEK Finished.\n";
 
 sub now_date {
     my $NowTime = time();
@@ -106,7 +106,7 @@ sub get_normal_distribution {
     my $PI = 3.1415926535897;
     my $gaussian = undef;
     until (judgment_range($gaussian, $expectations, $range)) {
-        $gaussian = sqrt(-2 * log(rand(1)))*cos(2 * $PI * rand(1));
+        $gaussian = sqrt(-2 * log(rand))*cos(2 * $PI * rand);
         $gaussian *= $variance;
         $gaussian += $expectations;
     }
