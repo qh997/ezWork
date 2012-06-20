@@ -70,7 +70,7 @@ foreach my $user (@userlist) {
             }
         }
         else {
-            print "Do not running today.\n"
+            print "$user_name: Do not running today.\n"
         }
     }
 }
