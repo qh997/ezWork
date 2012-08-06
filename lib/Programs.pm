@@ -27,7 +27,15 @@ if ($acunt ne '') {
     print "*" if $paswd eq '';
     print "] ";
 }
-chomp($input = <>);
+if ($commd eq 'PSWD') {
+    system('stty -echo');
+    chomp($input = <>);
+    print "\n";
+    system('stty echo');
+}
+else {
+    chomp($input = <>);
+}
 END
 
 our $USER_INPUT_AGENT = <<'END';
