@@ -3,7 +3,7 @@ package Response;
 use warnings;
 use strict;
 use version;
-our $VERSION = qv('0.1.5');
+our $VERSION = qv('0.1.6');
 
 use General;
 use User;
@@ -164,6 +164,7 @@ use Class::Std::Utils; {
         my $mesg = $command{ident $self}{content};
         if (my $next = GetNext($scmd)) {
             if ($scmd eq 'ACNT') {
+                $mesg =~ s/@.*//;
                 my ($login, $word) = User::Login($mesg);
                 if ($login) {
                     $result{ident $self}{command} = $next;

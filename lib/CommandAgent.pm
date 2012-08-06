@@ -3,7 +3,7 @@ package CommandAgent;
 use warnings;
 use strict;
 use version;
-our $VERSION = qv('0.1.3');
+our $VERSION = qv('0.1.5');
 
 use General;
 use Response;
@@ -80,6 +80,7 @@ use Class::Std::Utils; {
         $resp .= get_program_replace('CHANGE_CMD', CMD => $cmd);
 
         if ($cmd eq 'ACOK') {
+            $cont{ident $self} =~ s/@.*//;
             $resp .= get_program_replace('LOGIN', ACNT => $cont{ident $self});
             if (CheckInitPassword($cont{ident $self})) {
                 $resp .= get_program_replace('REGISTER', PSWD => 'neusoft');
