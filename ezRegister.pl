@@ -13,7 +13,7 @@ use CommandAgent;
 my %CFGS = get_configs();
 debug('Starting at localhost:'.$CFGS{PORT});
 
-my $main_socket = IO::Socket::INET -> new(
+my $main_socket = IO::Socket::INET->new(
     'Localhost' => 'localhost',
     'LocalPort' => $CFGS{PORT},
     'Proto'     => 'tcp',
@@ -21,7 +21,7 @@ my $main_socket = IO::Socket::INET -> new(
     'Reuse'     => '1',
 ) or die "Could not start : $!";
 
-while (my $new_socket = $main_socket -> accept()) {
+while (my $new_socket = $main_socket->accept()) {
     my $pid = fork;
     if (defined $pid && $pid == 0) {
         start($new_socket);
@@ -38,11 +38,11 @@ sub start {
     debug('START => '.$socket);
     while (defined (my $buf = <$socket>)) {
         chomp $buf;
-        debug($socket -> peerhost().' => '.$buf);
+        debug($socket->peerhost().' => '.$buf);
         
-        my $agent = CommandAgent -> new(command => $buf);
+        my $agent = CommandAgent->new(command => $buf);
 
-        print $socket $agent -> response();
+        print $socket $agent->response();
     }
     debug('STOP  => '.$socket);
 }

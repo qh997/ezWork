@@ -32,8 +32,8 @@ foreach my $user (@userlist) {
         foreach my $date_def (@user_time) {
             if (!$activity && $date_def =~ /^(\d+)-(\d+)$/) {
                 my ($lower, $upper) = ($1, $2);
-                $activity = $lower =~ /^\d$/ ? $lower <= $NOW_WEEK || $NOW_WEEK <= $upper
-                                             : $lower <= $NOW_DATE || $NOW_DATE <= $upper;
+                $activity = $lower =~ /^\d$/ ? $lower <= $NOW_WEEK && $NOW_WEEK <= $upper
+                                             : $lower <= $NOW_DATE && $NOW_DATE <= $upper;
             }
             elsif ($activity && $date_def =~ /^-(\d+)-(\d+)$/) {
                 my ($lower, $upper) = ($1, $2);

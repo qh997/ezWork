@@ -22,7 +22,7 @@ use Class::Std::Utils; {
 
         $account{ident $self} = '';
         $password{ident $self} = '';
-        $info{ident $self} = FieldControl -> new();
+        $info{ident $self} = FieldControl->new();
         $lack{ident $self} = 'NEED_ACCOUNT';
         
         return $self;
@@ -35,7 +35,7 @@ use Class::Std::Utils; {
         if ($input) {
             $account{ident $self} = $input;
             $password{ident $self} = '';
-            $info{ident $self} -> user('');
+            $info{ident $self}->user('');
             $lack{ident $self} = 'NEED_PASSWORD';
         }
 
@@ -49,12 +49,12 @@ use Class::Std::Utils; {
         if ($input) {
             if ($account{ident $self} && CheckPassword($account{ident $self}, $input)) {
                 $password{ident $self} = $input;
-                $info{ident $self} -> user($account{ident $self});
+                $info{ident $self}->user($account{ident $self});
                 $lack{ident $self} = 0;
             }
             else {
                 $password{ident $self} = '';
-                $info{ident $self} -> user('');
+                $info{ident $self}->user('');
                 $lack{ident $self} = 'NEED_PASSWORD';
             }
         }
@@ -108,7 +108,7 @@ use Class::Std::Utils; {
             }
             else {
                 if (CheckPassword($account{ident $self}, $password{ident $self})) {
-                    if ($self -> _change_password($password)) {
+                    if ($self->_change_password($password)) {
                         return (1, 'PASSWORD_CHANGED');
                     }
                     else {
@@ -134,7 +134,7 @@ use Class::Std::Utils; {
         }
         else {
             if (!$lack{ident $self}) {
-                return $info{ident $self} -> depend_on($next);
+                return $info{ident $self}->depend_on($next);
             }
         }
 
@@ -145,12 +145,12 @@ use Class::Std::Utils; {
         my $self = shift;
         my $field = shift;
 
-        my $fvalue = $self -> field_value($field);
+        my $fvalue = $self->field_value($field);
         $fvalue = defined $fvalue ? $fvalue : '';
 
         my $empty = 1;
         my $ret_str = '';
-        if (my @opt_list = $info{ident $self} -> get_field_option($field)) {
+        if (my @opt_list = $info{ident $self}->get_field_option($field)) {
             if (@opt_list ==1 && !defined $opt_list[0]) {
                 $empty = 2;
                 $ret_str = 'NO_OPTION';
@@ -181,10 +181,10 @@ use Class::Std::Utils; {
         my $warning = 0;
         $infos{ACNT} = StrPrtFmt($account{ident $self});
         $infos{PSWD} = StrPrtFmt($password{ident $self});
-        my %values = $info{ident $self} -> get_fields_value();
+        my %values = $info{ident $self}->get_fields_value();
         while (my ($field, $value) = each %values) {
             if (defined $value) {
-                my ($warn, $str) = $info{ident $self} -> get_value_description($field, $value);
+                my ($warn, $str) = $info{ident $self}->get_value_description($field, $value);
                 $str = StrPrtFmt($str);
                 $str = $warn ? $str.' <!Something wrong!>' : $str;
                 $infos{$field} = $str;
@@ -209,46 +209,46 @@ use Class::Std::Utils; {
             my $ftype = FieldControl::FieldType($field);
             if ($ftype eq 'TXT') {
                 if ($value) {
-                    $info{ident $self} -> set_field_value($field, $value);
+                    $info{ident $self}->set_field_value($field, $value);
 
                     $ret_word = 'SET_FIELD';
                 }
-                elsif ($self -> field_value($field)) {
+                elsif ($self->field_value($field)) {
                     $ret_word = 'NOTHING';
                 }
             }
             elsif ($ftype eq 'SEL') {
-                if (my @opt_list = $info{ident $self} -> get_field_option($field)) {
+                if (my @opt_list = $info{ident $self}->get_field_option($field)) {
                     if (@opt_list == 1 && !defined $opt_list[0]) {
                         $ret_word = 'INV_OPRT';
                     }
                     else {
                         if ($value) {
-                            if (grep $value eq $_ -> [0], @opt_list) {
-                                $info{ident $self} -> set_field_value($field, $value);
+                            if (grep $value eq $_->[0], @opt_list) {
+                                $info{ident $self}->set_field_value($field, $value);
                                 $ret_word = 'SET_FIELD';
                             }
                         }
                         else {
-                            my $current = $self -> field_value($field);
-                            if (grep $current eq $_ -> [0], @opt_list) {
+                            my $current = $self->field_value($field);
+                            if (grep $current eq $_->[0], @opt_list) {
                                 $ret_word = 'NOTHING';
                             }
                         }
                     }
                 }
                 else {
-                    $info{ident $self} -> set_field_value($field, '');
+                    $info{ident $self}->set_field_value($field, '');
                     $ret_word = 'SET_EMPTY';
                 }
             }
         }
         else {
-            my $retvalue = $info{ident $self} -> get_field_value($field);
+            my $retvalue = $info{ident $self}->get_field_value($field);
             $ret_word = defined $retvalue ? $retvalue : '';
         }
 
-        $info{ident $self} -> user($account{ident $self});
+        $info{ident $self}->user($account{ident $self});
         return $ret_word;
     }
 
@@ -316,17 +316,17 @@ use Class::Std::Utils; {
 
         my %CFGS = get_configs();
 
-        my $ldap = Net::LDAP -> new('mpc-auth.neusoft.com') or warn $@;
-        my $mesg = $ldap -> bind(
+        my $ldap = Net::LDAP->new('mpc-auth.neusoft.com') or warn $@;
+        my $mesg = $ldap->bind(
             'cn='.$CFGS{ADMIN}.', ou=people, dc=neusoft, dc=internal',
             password => $CFGS{ADMINPW},
         );
-        $mesg = $ldap -> search(
+        $mesg = $ldap->search(
             base => 'ou=people,dc=neusoft,dc=internal',
             filter => "cn=$username"
         );
 
-        return 0 if $mesg -> entries;
+        return 0 if $mesg->entries;
         return 1;
     }
 

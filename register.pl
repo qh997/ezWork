@@ -9,7 +9,7 @@ use MIME::Base64;
 chomp(my $SERVER = @ARGV ? shift : 'backup1');
 my $PORT   = '8321';
 
-my $socket = IO::Socket::INET -> new(
+my $socket = IO::Socket::INET->new(
     PeerAddr => $SERVER,
     PeerPort => $PORT,
     Type => SOCK_STREAM,
@@ -27,17 +27,17 @@ until ($commd eq 'HELP' && $input =~ /^\s*q(uit)?\s*$/i) {
     die $@ if $@;
 }
 
-$socket -> close() or die "Close Socket failed.$@";
+$socket->close() or die "Close Socket failed.$@";
 
 sub talk {
-    $socket -> send("$acunt:$paswd:$commd:".encode_base64($input, '')."\n", 0);
-    $socket -> autoflush(1);
+    $socket->send("$acunt:$paswd:$commd:".encode_base64($input, '')."\n", 0);
+    $socket->autoflush(1);
 
-    my $sel = IO::Select -> new($socket);
-    while (my @ready = $sel -> can_read) {
+    my $sel = IO::Select->new($socket);
+    while (my @ready = $sel->can_read) {
         foreach my $fh (@ready) {
             if ($fh == $socket) {
-                $fh -> recv(my $line, 81192);
+                $fh->recv(my $line, 81192);
                 $line =~ s/\n//g;
                 return $line;
             }

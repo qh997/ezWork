@@ -28,13 +28,13 @@ use Class::Std::Utils; {
         my ($class, %args) = @_;
         my $self = bless anon_scalar(), $class;
 
-        $resp{ident $self} = Response -> new();
+        $resp{ident $self} = Response->new();
         $acnt{ident $self} = '';
         $pswd{ident $self} = '';
         $type{ident $self} = '';
         $cont{ident $self} = '';
         
-        $self -> command_analyze(cmd => $args{command}) if $args{command};
+        $self->command_analyze(cmd => $args{command}) if $args{command};
         
         return $self;
     }
@@ -49,30 +49,30 @@ use Class::Std::Utils; {
             $type{ident $self} = $3;
             $cont{ident $self} = decode64($4);
             if ($type{ident $self}) {
-                $resp{ident $self} -> user(
+                $resp{ident $self}->user(
                     account => $acnt{ident $self},
                     password => $pswd{ident $self},
                 );
-                $resp{ident $self} -> command(
+                $resp{ident $self}->command(
                     type => $type{ident $self},
                     content => $cont{ident $self},
                 );
             }
             else {
-                $resp{ident $self} -> command(type => 'HELP', content => 'A');
-                $resp{ident $self} -> welcome();
+                $resp{ident $self}->command(type => 'HELP', content => 'A');
+                $resp{ident $self}->welcome();
             }
-            $resp{ident $self} -> analyze();
+            $resp{ident $self}->analyze();
         }
         else {
-            $resp{ident $self} -> set_warning("Bad of command format.\n");
+            $resp{ident $self}->set_warning("Bad of command format.\n");
         }
     }
 
     sub response {
         my $self = shift;
 
-        my ($cmd, $msg) = $resp{ident $self} -> get_result();
+        my ($cmd, $msg) = $resp{ident $self}->get_result();
         my $pmt = exists $PROMPTS{$cmd} ? $PROMPTS{$cmd} : $SPROMPT;
         debug("Return command = [$cmd]");
 
@@ -113,17 +113,17 @@ use Class::Std::Utils; {
     sub CheckInitPassword {
         my $account = shift;
 
-        my $chk = Response -> new();
-        $chk -> user(
+        my $chk = Response->new();
+        $chk->user(
             account => $account,
             password => '',
         );
-        $chk -> command(
+        $chk->command(
             type => 'PSWD',
             content => 'neusoft',
         );
-        $chk -> analyze();
-        my ($cmd, $msg) = $chk -> get_result();
+        $chk->analyze();
+        my ($cmd, $msg) = $chk->get_result();
         print $cmd."\n";
         print $msg."\n";
         return $cmd eq 'PWOK' ? 1 : 0;

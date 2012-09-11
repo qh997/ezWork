@@ -30,9 +30,9 @@ my @HEAD = (
     'Connection' => 'keep-alive',
 );
 
-my $browser = LWP::UserAgent -> new();
-my $response = $browser -> get($URLS{MAIN});
-my $cookie = ${$response -> headers}{'set-cookie'};
+my $browser = LWP::UserAgent->new();
+my $response = $browser->get($URLS{MAIN});
+my $cookie = ${$response->headers}{'set-cookie'};
 $cookie =~ s/(.*?);.*/$1/;
 push @HEAD, (Cookie => $cookie);
 
@@ -41,9 +41,9 @@ $logn_para .= '&username='.$USER{NAME};
 $logn_para .= '&password='.url_encode($USER{PSWD});
 $logn_para .= '&selLanguage=en_US&lawEmp=on';
 
-$response = $browser -> post($URLS{LOGN}.'?'.$logn_para, @HEAD);
-$response = $browser -> post($URLS{DLAD}, @HEAD);
-my $project = $response -> content;
+$response = $browser->post($URLS{LOGN}.'?'.$logn_para, @HEAD);
+$response = $browser->post($URLS{DLAD}, @HEAD);
+my $project = $response->content;
 
 unless ($project) {
     print "Invalid username or password.\n";
@@ -58,8 +58,8 @@ while ($project =~ m{<option value="(.*?)">(.*?)</option>}g) {
     my $proidx = $1;
     my $pronam = $2;
     $user_str .= "$proidx=$pronam\n";
-    $response = $browser -> post($URLS{DRDN}."?state=1&procode=$proidx", @HEAD);
-    my $sels = $response -> content;
+    $response = $browser->post($URLS{DRDN}."?state=1&procode=$proidx", @HEAD);
+    my $sels = $response->content;
     while ($sels =~ m{parent.setDropOptions\(new Array\((.*?)\),\s*"(.*?)"\);}g) {
         my $sel_name = $2;
         my $sel_str = $1;
@@ -77,8 +77,8 @@ while ($project =~ m{<option value="(.*?)">(.*?)</option>}g) {
 
             $user_str .= "*$opidx=$opnam\n";
             if ($sel_name =~ /selActType1/) {
-                $response = $browser -> post($URLS{DRDN}."?state=2&procode=$proidx&type1=$opidx", @HEAD);
-                my $act2_str = $response -> content;
+                $response = $browser->post($URLS{DRDN}."?state=2&procode=$proidx&type1=$opidx", @HEAD);
+                my $act2_str = $response->content;
                 if ($act2_str =~ m{parent.setDropOptions\(new Array\((.*?)\),\s*"selActType2"\);}) {
                     $user_str .= "**selActType2\n";
                     $act2_str = $1;

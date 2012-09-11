@@ -44,7 +44,7 @@ use Class::Std::Utils; {
 
         if (defined $input) {
             $user{ident $self} = $input;
-            if (!$self -> _read_infos()) {
+            if (!$self->_read_infos()) {
                 $user{ident $self} = '';
                 $info{ident $self} = {};
             }
@@ -59,8 +59,8 @@ use Class::Std::Utils; {
 
         my $depval = 0;
         if (exists $DEPEND{$field}) {
-            $depval = $self -> depend_on($DEPEND{$field});
-            if (!$depval && !defined $self -> get_field_value($DEPEND{$field})) {
+            $depval = $self->depend_on($DEPEND{$field});
+            if (!$depval && !defined $self->get_field_value($DEPEND{$field})) {
                 $depval = 'NEED_'.$DEPEND{$field};
             }
         }
@@ -80,7 +80,7 @@ use Class::Std::Utils; {
 
         my %values;
         foreach my $field (keys %FIELDS) {
-            $values{$field} = $self -> get_field_value($field);
+            $values{$field} = $self->get_field_value($field);
         }
 
         return %values;
@@ -97,15 +97,15 @@ use Class::Std::Utils; {
             $warn = $value ? 0 : 1;
         }
         else {
-            my @opts = $self -> get_field_option($field);
+            my @opts = $self->get_field_option($field);
             if (@opts) {
                 if (@opts == 1 && !defined $opts[0]) {
                     $warn = 0;
                 }
                 else {
-                    if (my ($desp) = grep $value eq $_ -> [0], @opts) {
+                    if (my ($desp) = grep $value eq $_->[0], @opts) {
                         $warn = 0;
-                        $rstr = '('.$desp -> [0].') '.$desp -> [1];
+                        $rstr = '('.$desp->[0].') '.$desp->[1];
                     }
                     else {
                         $warn = 1;
@@ -132,7 +132,7 @@ use Class::Std::Utils; {
         close $UF;
 
         my $account = $user{ident $self};
-        my $fname = $FIELDS{$field} -> [1];
+        my $fname = $FIELDS{$field}->[1];
         my $evalue = encode64($value);
 
         foreach my $line (@user_list) {
@@ -156,12 +156,12 @@ use Class::Std::Utils; {
         my $self = shift;
         my $field = shift;
 
-        if ($self -> depend_on($field)) {
+        if ($self->depend_on($field)) {
             return (undef);
         }
         else {
-            my $fname = $FIELDS{$field} -> [1];
-            my $search = $self -> _depend_value($field);
+            my $fname = $FIELDS{$field}->[1];
+            my $search = $self->_depend_value($field);
             my $account = $user{ident $self};
 
             my %CFGS = get_configs();
@@ -207,7 +207,7 @@ use Class::Std::Utils; {
         my $field = shift;
 
         if (SettingExists($field)) {
-            return $FIELDS{$field} -> [0];
+            return $FIELDS{$field}->[0];
         }
 
         return 0;
@@ -217,7 +217,7 @@ use Class::Std::Utils; {
         my $field = shift;
 
         if (SettingExists($field)) {
-            return $FIELDS{$field} -> [1];
+            return $FIELDS{$field}->[1];
         }
 
         return 0;
@@ -232,7 +232,7 @@ use Class::Std::Utils; {
         my @user_list = <$UF>;
         close $UF;
 
-        my $account = $self -> user();
+        my $account = $self->user();
         my @lines = grep(/^$account:/, @user_list);
         return 0 unless @lines;
 
@@ -240,7 +240,7 @@ use Class::Std::Utils; {
         chomp $line;
 
         while (my ($fdef, $fdetail) = each %FIELDS) {
-            my $fname = $fdetail -> [1];
+            my $fname = $fdetail->[1];
             if ($line =~ m/[:;]$fname<(.*?)(?:;|$)/) {
                 $info{ident $self}{$fdef} = decode_base64($1);
             }
@@ -258,8 +258,8 @@ use Class::Std::Utils; {
 
         my $depval = '';
         if (exists $DEPEND{$field}) {
-            $depval .= $self -> _depend_value($DEPEND{$field});
-            $depval .= $FIELDS{$DEPEND{$field}} -> [1].'='.$self -> get_field_value($DEPEND{$field}).';';
+            $depval .= $self->_depend_value($DEPEND{$field});
+            $depval .= $FIELDS{$DEPEND{$field}}->[1].'='.$self->get_field_value($DEPEND{$field}).';';
         }
 
         return $depval;

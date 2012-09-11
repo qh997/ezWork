@@ -29,20 +29,20 @@ my @HEAD = (
 
 print($USER{NAME}.' - '.now_time()."\n");
 
-my $browser = LWP::UserAgent -> new();
-my $response = $browser -> get($URLS{INDX}, @HEAD);
-$response -> is_success or die "Cannot get $URLS{INDX} -- ", $response -> status_line;
-my $cookie = ${$response -> headers}{'set-cookie'};
+my $browser = LWP::UserAgent->new();
+my $response = $browser->get($URLS{INDX}, @HEAD);
+$response->is_success or die "Cannot get $URLS{INDX} -- ", $response->status_line;
+my $cookie = ${$response->headers}{'set-cookie'};
 $cookie =~ s/(.*?);.*/$1/;
 push @HEAD, ('Cookie' => $cookie);
 
-my $neusoft_key = $response -> content;
+my $neusoft_key = $response->content;
 $neusoft_key =~ s/.*name="neusoft_key".*?value="ID(.*?)PWD\1".*/$1/s;
 
-my $name_id = $response -> content;
+my $name_id = $response->content;
 $name_id =~ s/.*name="(ID.*?)".*/$1/s;
 
-my $pass_id = $response -> content;
+my $pass_id = $response->content;
 $pass_id =~ s/.*name="(KEY.*?)".*/$1/s;
 
 my $logn_para = 'login=true';
@@ -52,19 +52,19 @@ $logn_para .= '&neusoft_key=ID'.$neusoft_key.'PWD'.$neusoft_key;
 $logn_para .= '&'.$name_id.'='.URL::Encode::url_encode($USER{NAME});
 $logn_para .= '&'.$pass_id.'='.URL::Encode::url_encode($USER{PSWD});
 
-$response = $browser -> post("$URLS{LOGN}?$logn_para", @HEAD);
-if ($response -> content =~ /href=".*?\?(error=.*?)"/) {
+$response = $browser->post("$URLS{LOGN}?$logn_para", @HEAD);
+if ($response->content =~ /href=".*?\?(error=.*?)"/) {
     print $USER{NAME}.":Receive error code when login : $1\n";
     exit 1;
 }
 
-$response = $browser -> get($URLS{MAIN}, @HEAD);
+$response = $browser->get($URLS{MAIN}, @HEAD);
 
-my $tempoid = $response -> content;
+my $tempoid = $response->content;
 $tempoid =~ s/.*name="currentempoid"\s+value="(.*?)".*/$1/s;
 my $rcod_para = 'currentempoid='.$tempoid;
 
-$response = $browser -> post("$URLS{RCOD}?$rcod_para", @HEAD);
+$response = $browser->post("$URLS{RCOD}?$rcod_para", @HEAD);
 
 exit 0;
 
