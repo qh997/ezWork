@@ -5,7 +5,7 @@ use strict;
 use LWP;
 use URL::Encode qw(url_encode);
 use version;
-our $VERSION = qv('0.1.2');
+our $VERSION = qv('0.1.3');
 
 BEGIN {push @INC, q[./lib]};
 use General;
@@ -54,7 +54,7 @@ $project =~ s{.*name="selProject" id="selProject".*?</OPTION>(.*?)</select>.*}{$
 
 my $user_str = "###$USER{NAME}###\n";
 $user_str .= "selProject\n";
-while ($project =~ m{<option value="(.*?)">(.*?)</option>}g) {
+while ($project =~ m{<option value="(.*?):\d+">(.*?)</option>}g) {
     my $proidx = $1;
     my $pronam = $2;
     $user_str .= "$proidx=$pronam\n";
