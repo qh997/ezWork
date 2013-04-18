@@ -20,46 +20,27 @@ open my $UF, "< $USERFILE";
 my @userlist = <$UF>;
 close $UF;
 
+my $global_time = shift @userlist;
+my $global_activity = get_active($global_time);
+
 foreach my $user (@userlist) {
     if ($user =~ /^(.*?):(.*?):(.*)$/) {
         my $user_name = $1;
         my $user_pass = decode_base64($2);
-        my @user_time = split ';', $3;
+        my $user_time = $3;
 
         next if ($SPECUSER && ($SPECUSER ne $user_name));
 
-        my $activity = '';
-        foreach my $date_def (@user_time) {
-            if (!$activity && $date_def =~ /^(\d+)-(\d+)$/) {
-                my ($lower, $upper) = ($1, $2);
-                $activity = $lower =~ /^\d$/ ? $lower <= $NOW_WEEK && $NOW_WEEK <= $upper
-                                             : $lower <= $NOW_DATE && $NOW_DATE <= $upper;
-            }
-            elsif ($activity && $date_def =~ /^-(\d+)-(\d+)$/) {
-                my ($lower, $upper) = ($1, $2);
-                $activity = $lower =~ /^\d$/ ? $lower > $NOW_WEEK || $NOW_WEEK > $upper
-                                             : $lower > $NOW_DATE || $NOW_DATE > $upper;
-            }
-            elsif (!$activity && $date_def =~ /^(\d+)$/) {
-                my $date = $1;
-                $activity = $date =~ /^\d$/ ? $date == $NOW_WEEK
-                                            : $date == $NOW_DATE;
-            }
-            elsif ($activity && $date_def =~ /^-(\d+)$/) {
-                my $date = $1;
-                $activity = $date =~ /^\d$/ ? $date != $NOW_WEEK
-                                            : $date != $NOW_DATE;
-            }
-        }
+        my $user_activity = get_active($user_time, $global_activity);
 
-        if ($activity) {
+        if ($user_activity) {
             my $run_time = get_normal_distribution($EXPCT, $VARIN, $RANGE, $ROUND);
 
             my $pid = fork();
             if (defined $pid && $pid == 0) {
                 print "$user_name sleep $run_time\n";
                 sleep $run_time;
-                my $fail = 5;
+                my $fail = 0;
                 while ($fail) {
                     system("/home/gengs/develops/ezWork/ezPunch.pl '$user_name' '$user_pass'") ? ($fail--) : ($fail = 0);
 
@@ -95,6 +76,37 @@ sub now_week {
     my (undef, undef, undef, undef, undef, undef, $wday, undef) = localtime(time());
 
     return $wday ? $wday : 7;
+}
+
+sub get_active {
+    my $time_str = shift;
+    my $activity = @_ ? shift : '';
+    my @time_ary = split ';', $time_str;
+
+    foreach my $date_def (@time_ary) {
+        if (!$activity && $date_def =~ /^(\d+)-(\d+)$/) {
+            my ($lower, $upper) = ($1, $2);
+            $activity = $lower =~ /^\d$/ ? $lower <= $NOW_WEEK && $NOW_WEEK <= $upper
+                                         : $lower <= $NOW_DATE && $NOW_DATE <= $upper;
+        }
+        elsif ($activity && $date_def =~ /^-(\d+)-(\d+)$/) {
+            my ($lower, $upper) = ($1, $2);
+            $activity = $lower =~ /^\d$/ ? $lower > $NOW_WEEK || $NOW_WEEK > $upper
+                                         : $lower > $NOW_DATE || $NOW_DATE > $upper;
+        }
+        elsif (!$activity && $date_def =~ /^(\d+)$/) {
+            my $date = $1;
+            $activity = $date =~ /^\d$/ ? $date == $NOW_WEEK
+                                        : $date == $NOW_DATE;
+        }
+        elsif ($activity && $date_def =~ /^-(\d+)$/) {
+            my $date = $1;
+            $activity = $date =~ /^\d$/ ? $date != $NOW_WEEK
+                                        : $date != $NOW_DATE;
+        }
+    }
+
+    return $activity;
 }
 
 sub get_normal_distribution {
