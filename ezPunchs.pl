@@ -9,9 +9,9 @@ my $USERFILE = '/home/gengs/develops/ezWork/accountpunchs';
 my $NOW_DATE = now_date();
 my $NOW_WEEK = now_week();
 
-my $EXPCT = 60 * 28 + 18;
-my $VARIN = 60 *  4 + 27;
-my $RANGE = 60 * 18 + 41;
+my $EXPCT = 60 * 7 + 18;
+my $VARIN = 60 * 2 + 27;
+my $RANGE = 60 * 4 + 41;
 my $ROUND = 5;
 
 print "\n$NOW_DATE:$NOW_WEEK\n";
@@ -22,6 +22,7 @@ close $UF;
 
 my $global_time = shift @userlist;
 my $global_activity = get_active($global_time);
+my @user_pids;
 
 foreach my $user (@userlist) {
     if ($user =~ /^(.*?):(.*?):(.*)$/) {
@@ -37,15 +38,18 @@ foreach my $user (@userlist) {
             my $run_time = get_normal_distribution($EXPCT, $VARIN, $RANGE, $ROUND);
 
             my $pid = fork();
-            if (defined $pid && $pid == 0) {
+            if ($pid) {
+                push @user_pids, $pid;
+            }
+            elsif (defined $pid && $pid == 0) {
                 print "$user_name sleep $run_time\n";
-                sleep $run_time;
+                sleep $run_time unless $SPECUSER;
                 my $fail = 5;
-                while ($fail) {
+                do {
                     system("/home/gengs/develops/ezWork/ezPunch.pl '$user_name' '$user_pass'") ? ($fail--) : ($fail = 0);
 
                     sleep 2 if $fail;
-                }
+                } while ($fail);
 
                 exit 0;
             }
@@ -56,8 +60,11 @@ foreach my $user (@userlist) {
     }
 }
 
-wait();
-sleep 1;
+
+foreach my $child (@user_pids) {
+    waitpid($child, 0);
+}
+
 print "$NOW_DATE:$NOW_WEEK Finished.\n";
 
 sub now_date {
@@ -118,7 +125,7 @@ sub get_normal_distribution {
     my $PI = 3.1415926535897;
     my $gaussian = undef;
     until (judgment_range($gaussian, $expectations, $range)) {
-        $gaussian = sqrt(-2 * log(rand))*cos(2 * $PI * rand);
+        $gaussian = sqrt(-2 * log(rand)) * cos(2 * $PI * rand);
         $gaussian *= $variance;
         $gaussian += $expectations;
     }
